@@ -104,6 +104,7 @@ class Game {
     }
     final spot = currentSide == Side.black ? BoardSpot.black : BoardSpot.white;
     board.setSpot(point, spot);
+    steps.add(point);
 
     _shouldRecalculateWinner = true;
     _toggleSide();
