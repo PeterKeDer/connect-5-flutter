@@ -170,6 +170,12 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     return null;
   }
 
+  Matrix4 get _boardTransform => Matrix4.identity()
+    ..scale(_zoom)
+    ..translate(_offset.dx / _zoom, _offset.dy / _zoom)
+    // Position board center
+    ..translate((1 / _zoom - 1) * defaultBoardSize / 2, (1 / _zoom - 1) * defaultBoardSize / 2);
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -178,14 +184,10 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
       onScaleEnd: _handleScaleEnd,
       onTapUp: _handleTapUp,
       child: Container(
-        color: Colors.white, // needed for gesture to activate on background
+        color: Colors.transparent, // needed for gesture to activate on background
         child: Center(
           child: Transform(
-            transform: Matrix4.identity()
-              ..scale(_zoom)
-              ..translate(_offset.dx / _zoom, _offset.dy / _zoom)
-              // Position board center
-              ..translate((1 / _zoom - 1) * defaultBoardSize / 2, (1 / _zoom - 1) * defaultBoardSize / 2),
+            transform: _boardTransform,
             child: GestureDetector(
               onTapUp: _handleTapUp,
               child: Container(

@@ -2,7 +2,7 @@ import 'package:connect_5/components/board_spot_painter.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:flutter/material.dart';
 
-typedef void HandlerFunction<T>(T);
+typedef void HandlerFunction<T>(T value);
 
 class BoardPainter extends CustomPainter {
   static const double LINE_WIDTH = 1;
