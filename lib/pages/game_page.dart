@@ -10,27 +10,33 @@ import 'package:connect_5/controllers/local_two_player.dart';
 import 'package:connect_5/models/game.dart';
 
 class GamePage extends StatefulWidget {
+ final GameMode gameMode;
+
+  GamePage(this.gameMode);
+
   @override
-  _GamePageState createState() => _GamePageState();
+  _GamePageState createState() => _GamePageState(gameMode);
 }
 
 class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   static const double DEFAULT_SPACING = 20;
 
-  GameMode gameMode;
+  final GameMode gameMode;
   GameController gameController;
+
+  _GamePageState(this.gameMode);
 
   @override
   void initState() {
     super.initState();
-  
-    _handleRestartGame(GameMode.twoPlayers);
+
+    _handleRestartGame();
   }
 
-  void _handleRestartGame(GameMode mode) {
+  void _handleRestartGame() {
     GameController newController;
 
-    switch (mode) {
+    switch (gameMode) {
       case GameMode.twoPlayers:
         newController = LocalTwoPlayerGameController(Game.createNew(15), this);
         break;
@@ -43,9 +49,40 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     }
 
     setState(() {
-      gameMode = mode;
       gameController = newController;
     });
+  }
+  
+  void _handleMenuButtonTapped() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          _buildMenuListTile(
+            leading: const Icon(Icons.refresh),
+            title: 'Restart Game',
+            onTap: _handleRestartGame
+          ),
+          _buildMenuListTile(
+            leading: const Icon(Icons.close),
+            title: 'Quit',
+            onTap: () => Navigator.pop(context),
+          )
+        ],
+      )
+    );
+  }
+
+  Widget _buildMenuListTile({Widget leading, String title, VoidCallback onTap}) {
+    return ListTile(
+      leading: leading,
+      title: Text(title),
+      onTap: () {
+        Navigator.pop(context);
+        onTap();
+      },
+    );
   }
 
   @override
@@ -65,7 +102,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 left: DEFAULT_SPACING,
                 right: DEFAULT_SPACING,
                 child: GameStatusBar(
-                  handleRestartGame: _handleRestartGame,
+                  handleMenuButtonTapped: _handleMenuButtonTapped,
                 )
               ),
             ],

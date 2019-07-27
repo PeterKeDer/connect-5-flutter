@@ -1,4 +1,4 @@
-import 'package:connect_5/pages/game_page.dart';
+import 'package:connect_5/pages/start_page.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(Connect5App());
@@ -11,7 +11,7 @@ class Connect5App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: GamePage(),
+      home: StartPage(),
     );
   }
 }

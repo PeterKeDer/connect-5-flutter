@@ -4,30 +4,20 @@ import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-typedef void GameModeHandler(GameMode gameMode);
-
 class GameStatusBar extends StatelessWidget {
   // TODO: move into global ui constants file
   static const double DEFAULT_SPACING = 20;
   static const double BAR_HEIGHT = 80;
   static const double BORDER_RADIUS = 10;
 
-  final GameModeHandler handleRestartGame;
+  final VoidCallback handleMenuButtonTapped;
 
-  GameStatusBar({this.handleRestartGame});
+  GameStatusBar({this.handleMenuButtonTapped});
 
-  Widget _buildPopupMenuButton() {
-    return PopupMenuButton<GameMode>(
-      child: Container(
-        width: 40,
-        height: 40,
-        child: Icon(Icons.refresh),
-      ),
-      onSelected: handleRestartGame,
-      itemBuilder: (_) => GAME_MODES.map((mode) => PopupMenuItem<GameMode>(
-        value: mode,
-        child: Text(getString(mode)),
-      )).toList()
+  Widget _buildMenuButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.menu),
+      onPressed: handleMenuButtonTapped
     );
   }
 
@@ -83,7 +73,7 @@ class GameStatusBar extends StatelessWidget {
             if (!gameController.game.isFinished)
               _buildPieceIndicator(gameController.game.currentSide),
             _buildStatusText(gameController),
-            _buildPopupMenuButton()
+            _buildMenuButton(context)
           ],
         ),
       ),

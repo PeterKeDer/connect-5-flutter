@@ -56,13 +56,6 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     _offsetAnimationController = AnimationController(duration: ANIMATION_DURATION, vsync: this);
   }
 
-  @override
-  void deactivate() {
-    super.deactivate();
-
-    _controller.dispose();
-  }
-
   void _handleScaleStart(ScaleStartDetails scale) {
     setState(() {
       _initialZoom = _zoom;
