@@ -1,3 +1,4 @@
+import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/components/status_bar.dart';
 import 'package:connect_5/controllers/local_bot.dart';
 import 'package:connect_5/models/game_mode.dart';
@@ -54,35 +55,18 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
   
   void _handleMenuButtonTapped() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          _buildMenuListTile(
-            leading: const Icon(Icons.refresh),
-            title: 'Restart Game',
-            onTap: _handleRestartGame
-          ),
-          _buildMenuListTile(
-            leading: const Icon(Icons.close),
-            title: 'Quit',
-            onTap: () => Navigator.pop(context),
-          )
-        ],
+    PopupActionSheet([
+      PopupActionSheetItem(
+        leading: const Icon(Icons.refresh),
+        text: 'Restart Game',
+        onTap: _handleRestartGame
+      ),
+      PopupActionSheetItem(
+        leading: const Icon(Icons.close),
+        text: 'Quit',
+        onTap: () => Navigator.pop(context),
       )
-    );
-  }
-
-  Widget _buildMenuListTile({Widget leading, String title, VoidCallback onTap}) {
-    return ListTile(
-      leading: leading,
-      title: Text(title),
-      onTap: () {
-        Navigator.pop(context);
-        onTap();
-      },
-    );
+    ]).show(context);
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/pages/game_page.dart';
 import 'package:flutter/material.dart';
@@ -11,22 +12,12 @@ class StartPage extends StatelessWidget {
   }
 
   void _handleNewGameButtonPressed(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: GAME_MODES.map((gameMode) =>
-          ListTile(
-            title: Text(getString(gameMode)),
-            onTap: () {
-              // Dismiss sheet
-              Navigator.pop(context);
-              _startNewGame(gameMode, context);
-            },
-          )
-        ).toList()
-      )
-    );
+    PopupActionSheet(
+      GAME_MODES.map((gameMode) => PopupActionSheetItem(
+        text: getString(gameMode),
+        onTap: () => _startNewGame(gameMode, context)
+      )).toList()
+    ).show(context);
   }
 
   void _startNewGame(GameMode gameMode, BuildContext context) {
