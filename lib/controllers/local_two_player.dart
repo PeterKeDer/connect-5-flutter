@@ -1,3 +1,4 @@
+import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_5/controllers/game_controller.dart';
 import 'package:connect_5/models/game.dart';
@@ -5,6 +6,8 @@ import 'package:connect_5/models/game.dart';
 class LocalTwoPlayerGameController extends GameController with BoardSpotPaintersMixin {
   Game game;
   final TickerProvider tickerProvider;
+
+  GameMode get gameMode => GameMode.twoPlayers;
 
   LocalTwoPlayerGameController(this.game, this.tickerProvider) {
     initBoardSpotPainters();

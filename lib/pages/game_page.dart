@@ -65,7 +65,6 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 left: DEFAULT_SPACING,
                 right: DEFAULT_SPACING,
                 child: GameStatusBar(
-                  gameMode: gameMode,
                   handleRestartGame: _handleRestartGame,
                 )
               ),

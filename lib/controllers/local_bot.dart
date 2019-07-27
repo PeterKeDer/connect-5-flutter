@@ -1,4 +1,5 @@
 import 'package:connect_5/models/game_bot.dart';
+import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_5/controllers/game_controller.dart';
 import 'package:connect_5/models/game.dart';
@@ -10,6 +11,8 @@ class LocalBotGameController extends GameController with BoardSpotPaintersMixin 
   GameBot bot;
   Side botSide;
   final TickerProvider tickerProvider;
+
+  GameMode get gameMode => botSide == Side.black ? GameMode.blackBot : GameMode.whiteBot;
 
   LocalBotGameController(this.game, this.bot, this.botSide, this.tickerProvider) {
     initBoardSpotPainters();

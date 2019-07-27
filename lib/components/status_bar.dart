@@ -10,11 +10,11 @@ class GameStatusBar extends StatelessWidget {
   // TODO: move into global ui constants file
   static const double DEFAULT_SPACING = 20;
   static const double BAR_HEIGHT = 80;
+  static const double BORDER_RADIUS = 10;
 
-  final GameMode gameMode;
   final GameModeHandler handleRestartGame;
 
-  GameStatusBar({this.gameMode, this.handleRestartGame});
+  GameStatusBar({this.handleRestartGame});
 
   Widget _buildPopupMenuButton() {
     return PopupMenuButton<GameMode>(
@@ -31,35 +31,48 @@ class GameStatusBar extends StatelessWidget {
     );
   }
 
-  Widget _buildPieceIndicator(Side side) =>
-    Container(
+  Widget _buildPieceIndicator(Side side) {
+    final size = BAR_HEIGHT - DEFAULT_SPACING;
+
+    return Container(
       padding: EdgeInsets.only(right: DEFAULT_SPACING),
-      height: BAR_HEIGHT - DEFAULT_SPACING,
-      width: BAR_HEIGHT - DEFAULT_SPACING,
+      height: size,
+      width: size,
       decoration: BoxDecoration(
         color: side == Side.black ? Colors.black : Colors.white,
-        borderRadius: BorderRadius.circular((BAR_HEIGHT - DEFAULT_SPACING) / 2)
+        borderRadius: BorderRadius.circular(size / 2)
       ),
     );
-
-  @override
-  Widget build(BuildContext context) {
-    final gameController = Provider.of<GameController>(context);
-
+  }
+  
+  Widget _buildStatusText(GameController gameController) {
     String statusBarText;
     if (gameController.game.winner != null) {
       statusBarText = gameController.game.winner.side == Side.black ? 'Black Victory!' : 'White Victory!';
     } else if (gameController.game.isFull) {
       statusBarText = 'Tie!';
     } else {
-      statusBarText = getString(gameMode);
+      statusBarText = getString(gameController.gameMode);
     }
+    
+    return Text(
+      statusBarText,
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold
+      )
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final gameController = Provider.of<GameController>(context);
 
     return Container(
       height: BAR_HEIGHT,
       decoration: BoxDecoration(
-        color: Colors.lightBlue.withAlpha(150),
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.lightBlue.withAlpha(180),
+        borderRadius: BorderRadius.circular(BORDER_RADIUS),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: DEFAULT_SPACING, vertical: DEFAULT_SPACING / 2),
@@ -69,13 +82,7 @@ class GameStatusBar extends StatelessWidget {
             // TODO: maybe animate this
             if (!gameController.game.isFinished)
               _buildPieceIndicator(gameController.game.currentSide),
-            Text(
-              statusBarText,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold
-              )
-            ),
+            _buildStatusText(gameController),
             _buildPopupMenuButton()
           ],
         ),

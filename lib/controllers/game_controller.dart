@@ -1,9 +1,11 @@
+import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_5/components/board_spot_painter.dart';
 import 'package:connect_5/models/game.dart';
 
 abstract class GameController extends ChangeNotifier {
   Game get game;
+  GameMode get gameMode;
   TickerProvider get tickerProvider;
   List<List<BoardSpotPainter>> spotPainters;
 
