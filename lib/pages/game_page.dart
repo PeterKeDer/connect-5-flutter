@@ -55,18 +55,20 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
   
   void _handleMenuButtonTapped() {
-    PopupActionSheet([
-      PopupActionSheetItem(
-        leading: const Icon(Icons.refresh),
-        text: 'Restart Game',
-        onTap: _handleRestartGame
-      ),
-      PopupActionSheetItem(
-        leading: const Icon(Icons.close),
-        text: 'Quit',
-        onTap: () => Navigator.pop(context),
-      )
-    ]).show(context);
+    PopupActionSheet(
+      items: [
+        PopupActionSheetItem(
+          leading: const Icon(Icons.refresh),
+          text: 'Restart Game',
+          onTap: _handleRestartGame
+        ),
+        PopupActionSheetItem(
+          leading: const Icon(Icons.close),
+          text: 'Quit',
+          onTap: () => Navigator.pop(context),
+        )
+      ]
+    ).show(context);
   }
 
   @override

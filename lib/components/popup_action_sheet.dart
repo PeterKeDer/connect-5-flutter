@@ -9,9 +9,10 @@ class PopupActionSheetItem {
 }
 
 class PopupActionSheet extends StatelessWidget {
+  final String title;
   final List<PopupActionSheetItem> items;
 
-  PopupActionSheet(this.items);
+  PopupActionSheet({this.title, @required this.items});
 
   void show(BuildContext context) {
     showModalBottomSheet(
@@ -24,16 +25,27 @@ class PopupActionSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: items.map((item) =>
-        ListTile(
-          leading: item.leading,
-          title: Text(item.text),
-          onTap: () {
-            Navigator.pop(context);
-            item.onTap();
-          },
-        )
-      ).toList()
+      children: [
+        if (title != null && title.isNotEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Text(
+              title,
+            style: TextStyle(color: Colors.black45),
+            ),
+          ),
+
+        ...items.map((item) =>
+          ListTile(
+            leading: item.leading,
+            title: Text(item.text),
+            onTap: () {
+              Navigator.pop(context);
+              item.onTap();
+            },
+          )
+        ).toList()
+      ]
     );
   }
 }
