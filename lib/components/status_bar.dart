@@ -4,20 +4,47 @@ import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class GameStatusBar extends StatelessWidget {
+class GameStatusBar extends StatefulWidget {
+  final GameController gameController;
+  final VoidCallback handleMenuButtonTapped;
+
+  GameStatusBar({this.gameController, this.handleMenuButtonTapped});
+
+  @override
+  _GameStatusBarState createState() => _GameStatusBarState();
+}
+
+class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProviderStateMixin {
   // TODO: move into global ui constants file
   static const double DEFAULT_SPACING = 20;
   static const double BAR_HEIGHT = 80;
   static const double BORDER_RADIUS = 10;
+  static const ANIMATION_DURATION = Duration(milliseconds: 150);
 
-  final VoidCallback handleMenuButtonTapped;
+  AnimationController _pieceColorAnimationController;
+  Animation<Color> _pieceColorAnimation;
 
-  GameStatusBar({this.handleMenuButtonTapped});
+  Color _currentColor;
+  Side _prevSide;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _pieceColorAnimationController = AnimationController(duration: ANIMATION_DURATION, vsync: this); 
+  }
+
+  @override
+  void dispose() {
+    _pieceColorAnimationController.dispose();
+
+    super.dispose();
+  }
 
   Widget _buildMenuButton(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.menu),
-      onPressed: handleMenuButtonTapped
+      onPressed: widget.handleMenuButtonTapped
     );
   }
 
@@ -29,7 +56,7 @@ class GameStatusBar extends StatelessWidget {
       height: size,
       width: size,
       decoration: BoxDecoration(
-        color: side == Side.black ? Colors.black : Colors.white,
+        color: _currentColor,
         borderRadius: BorderRadius.circular(size / 2)
       ),
     );
@@ -57,6 +84,21 @@ class GameStatusBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gameController = Provider.of<GameController>(context);
+
+    if (_prevSide != gameController.game.currentSide) {
+      _prevSide = gameController.game.currentSide;
+      final color = _prevSide == Side.black ? Colors.black : Colors.white;
+
+      _pieceColorAnimationController.reset();
+      _pieceColorAnimation = ColorTween(begin: _currentColor, end: color).animate(_pieceColorAnimationController);
+      _pieceColorAnimation.addListener(() {
+        print(_pieceColorAnimation.value);
+        setState(() {
+          _currentColor = _pieceColorAnimation.value;
+        });
+      });
+      _pieceColorAnimationController.forward();
+    }
 
     return Container(
       height: BAR_HEIGHT,
