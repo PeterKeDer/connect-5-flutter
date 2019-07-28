@@ -92,7 +92,6 @@ class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProvider
       _pieceColorAnimationController.reset();
       _pieceColorAnimation = ColorTween(begin: _currentColor, end: color).animate(_pieceColorAnimationController);
       _pieceColorAnimation.addListener(() {
-        print(_pieceColorAnimation.value);
         setState(() {
           _currentColor = _pieceColorAnimation.value;
         });

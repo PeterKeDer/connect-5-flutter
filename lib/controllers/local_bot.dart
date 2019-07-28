@@ -19,6 +19,10 @@ class LocalBotGameController extends GameController with BoardSpotPaintersMixin 
 
     bot.initialize(game, botSide);
 
+    if (game.steps.isNotEmpty) {
+      highlightPoints([game.steps.last]);
+    }
+
     if (game.currentSide == botSide) {
       _startBotMove();
     }

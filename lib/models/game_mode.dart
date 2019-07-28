@@ -10,6 +10,8 @@ const GAME_MODES = [
   GameMode.whiteBot
 ];
 
+GameMode gameModeFromString(String str) => GameMode.values.firstWhere((gameMode) => gameMode.toString() == str);
+
 Widget getIcon(GameMode gameMode, {double size = 25, Color color = Colors.black45}) {
   switch (gameMode) {
     case GameMode.twoPlayers:

@@ -1,3 +1,6 @@
+import 'package:connect_5/models/game_mode.dart';
+import 'package:connect_5/models/storable_games.dart';
+
 enum GameError {
   outOfBounds,
   spotTaken,
@@ -11,6 +14,8 @@ enum BoardSpot {
 enum Side {
   black, white
 }
+
+Side sideFromString(String str) => Side.values.firstWhere((s) => s.toString() == str);
 
 class Point {
   int x, y;
@@ -87,18 +92,28 @@ class Game {
   /// Initialize a game from given steps
   /// Can throw OutOfBoardException and SpotTakenException
   Game.fromSteps(
-    this.steps,
+    List<Point> steps,
     {int size = 15,
     this.initialSide = Side.black}
-  ) {
-    currentSide = initialSide;
-    board = Board.withSize(size);
-
+  ) : steps = [],
+      currentSide = initialSide,
+      board = Board.withSize(size)
+  {
     steps.forEach(addStep);
   }
 
+  /// Initialize game from GameData (used for persistent storage)
+  factory Game.fromGameData(GameData data) => Game.fromSteps(
+    data.steps,
+    size: data.boardSize,
+    initialSide: data.initialSide
+  );
+
+  /// Get GameData from game
+  GameData getGameData(GameMode gameMode) => GameData(board.size, initialSide, steps, gameMode);
+
   /// Add a step, throws spotTaken error if spot is not empty
-  void addStep(Point point) {
+  void addStep(Point point, {bool addToSteps = true}) {
     if (board.getSpot(point) != BoardSpot.empty) {
       throw GameError.spotTaken;
     }

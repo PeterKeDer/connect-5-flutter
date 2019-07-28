@@ -1,9 +1,18 @@
 import 'package:connect_5/components/popup_action_sheet.dart';
+import 'package:connect_5/helpers/storage_manager.dart';
+import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/pages/game_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class StartPage extends StatelessWidget {
+class StartPage extends StatefulWidget {
+  @override
+  _StartPageState createState() => _StartPageState();
+}
+
+class _StartPageState extends State<StartPage> {
+
   Widget _buildButton(String title, VoidCallback onPressed) {
     return RaisedButton(
       child: Text(
@@ -17,22 +26,27 @@ class StartPage extends StatelessWidget {
     );
   }
 
-  void _handleNewGameButtonPressed(BuildContext context) {
+  void _handleContinueGameButtonPressed() {
+    final gameData = Provider.of<GameStorageManager>(context).games.lastGame;
+    _startGame(gameData.gameMode, game: Game.fromGameData(gameData));
+  }
+
+  void _handleNewGameButtonPressed() {
     PopupActionSheet(
       title: 'Start New Game',
       items: GAME_MODES.map((gameMode) => PopupActionSheetItem(
         leading: getIcon(gameMode),
         text: getString(gameMode),
-        onTap: () => _startNewGame(gameMode, context)
+        onTap: () => _startGame(gameMode)
       )).toList()
     ).show(context);
   }
 
-  void _startNewGame(GameMode gameMode, BuildContext context) {
+  void _startGame(GameMode gameMode, {Game game}) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => GamePage(gameMode),
+        builder: (_) => GamePage(gameMode, game: game),
         fullscreenDialog: true, // Prevents swipe back
       )
     );
@@ -52,6 +66,8 @@ class StartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final storageManger = Provider.of<GameStorageManager>(context);
+
     return Material(
       child: SafeArea(
         child: Stack(
@@ -76,8 +92,8 @@ class StartPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      _buildButton('Continue Game', null),
-                      _buildButton('New Game', () => _handleNewGameButtonPressed(context)),
+                      _buildButton('Continue Game', storageManger.games?.lastGame == null ? null : _handleContinueGameButtonPressed),
+                      _buildButton('New Game', _handleNewGameButtonPressed),
                       _buildButton('Multiplayer', null),
                       _buildButton('Replays', null),
                     ],

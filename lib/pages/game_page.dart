@@ -1,6 +1,7 @@
 import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/components/status_bar.dart';
 import 'package:connect_5/controllers/local_bot.dart';
+import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/models/min_max_bot.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +13,9 @@ import 'package:connect_5/models/game.dart';
 
 class GamePage extends StatefulWidget {
  final GameMode gameMode;
+ final Game game;
 
-  GamePage(this.gameMode);
+  GamePage(this.gameMode, {this.game});
 
   @override
   _GamePageState createState() => _GamePageState(gameMode);
@@ -31,27 +33,33 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _handleRestartGame();
+    _startGame(widget.game ?? Game.createNew(15));
   }
 
-  void _handleRestartGame() {
+  void _startGame(Game game) {
     GameController newController;
 
     switch (gameMode) {
       case GameMode.twoPlayers:
-        newController = LocalTwoPlayerGameController(Game.createNew(15), this);
+        newController = LocalTwoPlayerGameController(game, this);
         break;
       case GameMode.blackBot:
-        newController = LocalBotGameController(Game.createNew(15), MinMaxBot(), Side.black, this);
+        newController = LocalBotGameController(game, MinMaxBot(), Side.black, this);
         break;
       case GameMode.whiteBot:
-        newController = LocalBotGameController(Game.createNew(15), MinMaxBot(), Side.white, this);
+        newController = LocalBotGameController(game, MinMaxBot(), Side.white, this);
         break;
     }
+
+    newController.addListener(_saveLastGame);
 
     setState(() {
       gameController = newController;
     });
+  }
+
+  void _handleRestartGame() {
+    _startGame(Game.createNew(15));
   }
   
   void _handleMenuButtonTapped() {
@@ -65,10 +73,26 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
         PopupActionSheetItem(
           leading: const Icon(Icons.close),
           text: 'Quit',
-          onTap: () => Navigator.pop(context),
+          onTap: () {
+            _saveLastGame();
+            Navigator.pop(context);
+          },
         )
       ]
     ).show(context);
+  }
+
+  void _saveLastGame() {
+    final game = gameController.game;
+    final storageManager = Provider.of<GameStorageManager>(context);
+
+    if (!game.isFinished && game.steps.isNotEmpty) {
+      // Game is not finished and not empty, save game
+      storageManager.saveLastGame(game.getGameData(gameMode));
+    } else {
+      // Clear saved game
+      storageManager.clearLastGame();
+    }
   }
 
   @override

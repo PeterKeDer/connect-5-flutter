@@ -11,6 +11,10 @@ class LocalTwoPlayerGameController extends GameController with BoardSpotPainters
 
   LocalTwoPlayerGameController(this.game, this.tickerProvider) {
     initBoardSpotPainters();
+
+    if (game.steps.isNotEmpty) {
+      highlightPoints([game.steps.last]);
+    }
   }
 
   @override
