@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 
 class GameStorageManager extends ChangeNotifier {
   static const GAMES_FILENAME = 'games.json';
+  static const MAX_REPLAYS = 20;
 
   static final shared = GameStorageManager();
 
@@ -48,6 +49,16 @@ class GameStorageManager extends ChangeNotifier {
 
   /// Clear the last game
   void clearLastGame() => saveLastGame(null);
+
+  void saveReplay(GameData gameData) {
+    if (games.replays.length >= MAX_REPLAYS) {
+      games.replays.removeLast();
+    }
+    games.replays.insert(0, gameData);
+    _writeGames();
+
+    notifyListeners();
+  }
 
   /// Write games to file
   Future<void> _writeGames() async {

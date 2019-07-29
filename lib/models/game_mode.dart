@@ -4,7 +4,7 @@ enum GameMode {
   twoPlayers, blackBot, whiteBot
 }
 
-const GAME_MODES = [
+const LOCAL_GAME_MODES = [
   GameMode.twoPlayers,
   GameMode.blackBot,
   GameMode.whiteBot

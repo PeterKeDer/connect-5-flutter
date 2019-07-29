@@ -41,6 +41,7 @@ class LocalTwoPlayerGameController extends GameController with BoardSpotPainters
         highlightPoints(winner.points);
       }
 
+      gameEventListener();
       notifyListeners();
 
     } on GameError catch (error) {
@@ -59,6 +60,7 @@ class LocalTwoPlayerGameController extends GameController with BoardSpotPainters
   void undo() {
     try {
       game.undoStep();
+      gameEventListener();
       notifyListeners();
 
     } on GameError catch (error) {

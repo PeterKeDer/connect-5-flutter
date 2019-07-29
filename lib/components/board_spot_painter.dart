@@ -31,6 +31,12 @@ class BoardSpotPainter extends ChangeNotifier {
     _animatePiece(1);
   }
 
+  void addPiece(Side side) {
+    _pieceSide = side;
+    _pieceProgress = 1;
+    notifyListeners();
+  }
+
   void removePieceAnimated() => _animatePiece(0);
 
   void _animatePiece(double progress) {

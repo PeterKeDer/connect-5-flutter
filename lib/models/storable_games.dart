@@ -6,14 +6,16 @@ class GameData {
   Side initialSide;
   List<Point> steps;
   GameMode gameMode;
+  Side winner;
 
-  GameData(this.boardSize, this.initialSide, this.steps, this.gameMode);
+  GameData(this.boardSize, this.initialSide, this.steps, this.gameMode, this.winner);
 
   GameData.fromJson(Map<String, dynamic> json)
     : boardSize = json['boardSize'],
       initialSide = sideFromString(json['initialSide']),
       steps = List<Point>.from(json['steps'].map((point) => Point(point['x'], point['y']))),
-      gameMode = gameModeFromString(json['gameMode']);
+      gameMode = gameModeFromString(json['gameMode']),
+      winner = json['winner'] != null ? sideFromString(json['winner']) : null;
 
   Map<String, dynamic> toJson() => {
     'boardSize': boardSize,
@@ -22,7 +24,8 @@ class GameData {
       'x': point.x,
       'y': point.y
     }).toList(),
-    'gameMode': gameMode.toString()
+    'gameMode': gameMode.toString(),
+    'winner': winner?.toString()
   };
 }
 
@@ -38,6 +41,6 @@ class StorableGames {
 
   Map<String, dynamic> toJson() => {
     'lastGame': lastGame?.toJson(),
-    'replays': replays.map((game) => game.toString()).toList()
+    'replays': replays.map((game) => game.toJson()).toList()
   };
 }

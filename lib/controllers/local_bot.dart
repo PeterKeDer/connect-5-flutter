@@ -75,6 +75,7 @@ class LocalBotGameController extends GameController with BoardSpotPaintersMixin 
         highlightPoints(winner.points);
       }
 
+      gameEventListener();
       notifyListeners();
       
       if (game.currentSide == botSide && !game.isFinished) {

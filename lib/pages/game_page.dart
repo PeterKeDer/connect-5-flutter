@@ -51,7 +51,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
         break;
     }
 
-    newController.addListener(_saveLastGame);
+    newController.onGameEvent(_saveGame);
 
     setState(() {
       gameController = newController;
@@ -59,6 +59,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
 
   void _handleRestartGame() {
+    Provider.of<GameStorageManager>(context).clearLastGame();
     _startGame(Game.createNew(15));
   }
   
@@ -74,7 +75,6 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
           leading: const Icon(Icons.close),
           text: 'Quit',
           onTap: () {
-            _saveLastGame();
             Navigator.pop(context);
           },
         )
@@ -82,7 +82,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     ).show(context);
   }
 
-  void _saveLastGame() {
+  void _saveGame() {
     final game = gameController.game;
     final storageManager = Provider.of<GameStorageManager>(context);
 
@@ -92,6 +92,11 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     } else {
       // Clear saved game
       storageManager.clearLastGame();
+    }
+
+    if (game.isFinished) {
+      // Save to replays
+      storageManager.saveReplay(game.getGameData(gameMode));
     }
   }
 

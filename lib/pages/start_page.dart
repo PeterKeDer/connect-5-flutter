@@ -3,6 +3,7 @@ import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/pages/game_page.dart';
+import 'package:connect_5/pages/replays_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -34,7 +35,7 @@ class _StartPageState extends State<StartPage> {
   void _handleNewGameButtonPressed() {
     PopupActionSheet(
       title: 'Start New Game',
-      items: GAME_MODES.map((gameMode) => PopupActionSheetItem(
+      items: LOCAL_GAME_MODES.map((gameMode) => PopupActionSheetItem(
         leading: getIcon(gameMode),
         text: getString(gameMode),
         onTap: () => _startGame(gameMode)
@@ -42,12 +43,22 @@ class _StartPageState extends State<StartPage> {
     ).show(context);
   }
 
+  /// Start a game with game mode, and optionally game (null for create new game)
   void _startGame(GameMode gameMode, {Game game}) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => GamePage(gameMode, game: game),
         fullscreenDialog: true, // Prevents swipe back
+      )
+    );
+  }
+
+  void _handleReplaysButtonPressed() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ReplaysPage()
       )
     );
   }
@@ -73,7 +84,7 @@ class _StartPageState extends State<StartPage> {
         child: Stack(
           children: <Widget>[
             Positioned(
-              top: 20,
+              top: 40,
               left: 0,
               right: 0,
               child: Text(
@@ -95,7 +106,7 @@ class _StartPageState extends State<StartPage> {
                       _buildButton('Continue Game', storageManger.games?.lastGame == null ? null : _handleContinueGameButtonPressed),
                       _buildButton('New Game', _handleNewGameButtonPressed),
                       _buildButton('Multiplayer', null),
-                      _buildButton('Replays', null),
+                      _buildButton('Replays', _handleReplaysButtonPressed),
                     ],
                   ),
                 ),

@@ -110,7 +110,7 @@ class Game {
   );
 
   /// Get GameData from game
-  GameData getGameData(GameMode gameMode) => GameData(board.size, initialSide, steps, gameMode);
+  GameData getGameData(GameMode gameMode) => GameData(board.size, initialSide, steps, gameMode, winner?.side);
 
   /// Add a step, throws spotTaken error if spot is not empty
   void addStep(Point point, {bool addToSteps = true}) {

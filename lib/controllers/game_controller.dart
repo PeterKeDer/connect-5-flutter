@@ -13,6 +13,11 @@ abstract class GameController extends ChangeNotifier {
   void tap(Point point);
   void undo();
   void moveBoard();
+
+  VoidCallback gameEventListener;
+  void onGameEvent(VoidCallback listener) {
+    gameEventListener = listener;
+  }
 }
 
 mixin BoardSpotPaintersMixin on GameController {

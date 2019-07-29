@@ -10,8 +10,10 @@ class BoardPainter extends CustomPainter {
   
   final Game game;
   final List<List<BoardSpotPainter>> spotPainters;
+  final double cornerRadius;
+  final bool drawLines;
 
-  BoardPainter({this.game, this.spotPainters});
+  BoardPainter({this.game, this.spotPainters, this.drawLines = true, this.cornerRadius = CORNER_RADIUS});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -19,7 +21,7 @@ class BoardPainter extends CustomPainter {
 
     final boardRect = Rect.fromLTWH(0, 0, boardSize, boardSize);
     
-    final boardRRect = RRect.fromRectAndRadius(boardRect, Radius.circular(CORNER_RADIUS));
+    final boardRRect = RRect.fromRectAndRadius(boardRect, Radius.circular(cornerRadius));
     
     final boardPaint = Paint()
       ..color = Color.fromRGBO(240, 210, 180, 1);
@@ -40,21 +42,23 @@ class BoardPainter extends CustomPainter {
       // Line distance from edge: 1 * boxSize (*0.5 to position center, *0.5 padding)
       Offset((x + 1) * boxSize + dx, (y + 1) * boxSize + dy);
 
-    for (var i=0; i<game.board.size; i++) {
-      final halfLineWidth = LINE_WIDTH / 2;
-      // Horizontal line
-      canvas.drawLine(
-        getCenter(0, i, dx: -halfLineWidth),
-        getCenter(game.board.size - 1, i, dx: halfLineWidth),
-        linePaint
-      );
+    if (drawLines) {
+      for (var i=0; i<game.board.size; i++) {
+        final halfLineWidth = LINE_WIDTH / 2;
+        // Horizontal line
+        canvas.drawLine(
+          getCenter(0, i, dx: -halfLineWidth),
+          getCenter(game.board.size - 1, i, dx: halfLineWidth),
+          linePaint
+        );
 
-      // Vertical line
-      canvas.drawLine(
-        getCenter(i, 0, dy: -halfLineWidth),
-        getCenter(i, game.board.size - 1, dy: halfLineWidth),
-        linePaint
-      );
+        // Vertical line
+        canvas.drawLine(
+          getCenter(i, 0, dy: -halfLineWidth),
+          getCenter(i, game.board.size - 1, dy: halfLineWidth),
+          linePaint
+        );
+      }
     }
 
     for (int x=0; x<game.board.size; x++) {
