@@ -1,6 +1,7 @@
 import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/components/status_bar.dart';
 import 'package:connect_5/controllers/local_bot.dart';
+import 'package:connect_5/controllers/replay_controller.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/models/min_max_bot.dart';
@@ -12,10 +13,13 @@ import 'package:connect_5/controllers/local_two_player.dart';
 import 'package:connect_5/models/game.dart';
 
 class GamePage extends StatefulWidget {
- final GameMode gameMode;
- final Game game;
+  final GameMode gameMode;
+  final Game game;
+  final bool isReplay;
 
-  GamePage(this.gameMode, {this.game});
+  GamePage(this.gameMode, {this.game}) : isReplay = false;
+
+  GamePage.replay(this.gameMode, this.game) : isReplay = true;
 
   @override
   _GamePageState createState() => _GamePageState(gameMode);
@@ -39,7 +43,10 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   void _startGame(Game game) {
     GameController newController;
 
-    switch (gameMode) {
+    if (widget.isReplay) {
+      newController = ReplayGameController(widget.game, gameMode, this);
+    } else {
+      switch (gameMode) {
       case GameMode.twoPlayers:
         newController = LocalTwoPlayerGameController(game, this);
         break;
@@ -49,6 +56,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       case GameMode.whiteBot:
         newController = LocalBotGameController(game, MinMaxBot(), Side.white, this);
         break;
+      }
     }
 
     newController.onGameEvent(_saveGame);
@@ -59,8 +67,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
 
   void _handleRestartGame() {
-    Provider.of<GameStorageManager>(context).clearLastGame();
-    _startGame(Game.createNew(15));
+    if (!widget.isReplay) {
+      Provider.of<GameStorageManager>(context).clearLastGame();
+      _startGame(Game.createNew(15));
+    } else {
+      _startGame(widget.game);
+    }
   }
   
   void _handleMenuButtonTapped() {
@@ -83,6 +95,10 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
 
   void _saveGame() {
+    if (widget.isReplay) {
+      return;
+    }
+
     final game = gameController.game;
     final storageManager = Provider.of<GameStorageManager>(context);
 

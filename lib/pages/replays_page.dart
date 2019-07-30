@@ -3,6 +3,7 @@ import 'package:connect_5/components/board_spot_painter.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
+import 'package:connect_5/pages/game_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,10 +26,10 @@ class ReplaysPage extends StatelessWidget {
     return spotPainters;
   }
 
-  Widget _buildGameListTile(Game game, GameMode gameMode, Side winner) =>
+  Widget _buildGameListTile(BuildContext context, Game game, GameMode gameMode, Side winner) =>
     Container(
       child: InkWell(
-        onTap: () {},
+        onTap: () => _showReplay(context, game, gameMode),
         child: Row(
           children: <Widget>[
             Padding(padding: const EdgeInsets.all(SPACING)),
@@ -50,20 +51,44 @@ class ReplaysPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(getString(gameMode)),
+                Text(
+                  getString(gameMode),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18
+                  )
+                ),
                 Padding(padding: const EdgeInsets.only(top: SPACING)),
-                if (winner == null)
-                  Text('Tie')
-                else if (winner == Side.black)
-                  Text('Black Victory')
-                else  
-                  Text('White Victory')
+                Text(
+                  _getWinnerText(winner),
+                  style: TextStyle(fontSize: 16),
+                )
               ],
             )
           ],
         ),
       ),
     );
+  
+  String _getWinnerText(Side winner) {
+    if (winner == null) {
+      return 'Tie';
+    } else if (winner == Side.black) {
+      return 'Black Victory';
+    } else {
+      return 'White Victory';
+    }
+  }
+  
+  void _showReplay(BuildContext context, Game game, GameMode gameMode) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => GamePage.replay(gameMode, game),
+        fullscreenDialog: true
+      )
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +102,7 @@ class ReplaysPage extends StatelessWidget {
       body: ListView.builder(
         itemExtent: BOARD_SIZE + 2 * SPACING,
         itemCount: games.length,
-        itemBuilder: (_, i) => _buildGameListTile(games[i], gameDatas[i].gameMode, gameDatas[i].winner)
+        itemBuilder: (context, i) => _buildGameListTile(context, games[i], gameDatas[i].gameMode, gameDatas[i].winner)
       ),
     );
   }
