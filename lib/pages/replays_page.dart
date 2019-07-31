@@ -3,22 +3,23 @@ import 'package:connect_5/components/board_spot_painter.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
+import 'package:connect_5/models/storable_games.dart';
 import 'package:connect_5/pages/game_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ReplaysPage extends StatelessWidget {
   static const double BOARD_SIZE = 80;
-  static const double SPACING = 10;
+  static const double SPACING = 15;
 
-  List<List<BoardSpotPainter>> _getSpotPainters(Game game) {
+  List<List<BoardSpotPainter>> _getSpotPainters(ReplayData replay) {
     // Never animated, so ticker provider null is ok
-    final spotPainters = List.generate(game.board.size, (_) =>
-      List.generate(game.board.size, (_) => BoardSpotPainter(null))
+    final spotPainters = List.generate(replay.boardSize, (_) =>
+      List.generate(replay.boardSize, (_) => BoardSpotPainter(null))
     );
 
-    Side side = game.initialSide;
-    for (final point in game.steps) {
+    Side side = replay.initialSide;
+    for (final point in replay.steps) {
       spotPainters[point.x][point.y].addPiece(side);
       side = side == Side.black ? Side.white : Side.black;
     }
@@ -26,45 +27,47 @@ class ReplaysPage extends StatelessWidget {
     return spotPainters;
   }
 
-  Widget _buildGameListTile(BuildContext context, Game game, GameMode gameMode, Side winner) =>
+  Widget _buildGameListTile(BuildContext context, ReplayData replay, List<List<BoardSpotPainter>> spotPainters) =>
     Container(
       child: InkWell(
-        onTap: () => _showReplay(context, game, gameMode),
+        onTap: () => _showReplay(context, replay),
         child: Row(
           children: <Widget>[
-            Padding(padding: const EdgeInsets.all(SPACING)),
-            Container(
-              // padding: const EdgeInsets.all(SPACING),
-              width: BOARD_SIZE,
-              height: BOARD_SIZE,
-              child: CustomPaint(
-                painter: BoardPainter(
-                  game: game,
-                  spotPainters: _getSpotPainters(game),
-                  cornerRadius: 0,
-                  drawLines: false,
+            Padding(
+              padding: const EdgeInsets.all(SPACING),
+              child: Container(
+                width: BOARD_SIZE,
+                height: BOARD_SIZE,
+                child: CustomPaint(
+                  painter: BoardPainter(
+                    boardSize: replay.boardSize,
+                    spotPainters: spotPainters,
+                    cornerRadius: 3,
+                    drawLines: false,
+                  ),
                 ),
               ),
             ),
-            Padding(padding: const EdgeInsets.all(SPACING)),
             Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  getString(gameMode),
+                  getString(replay.gameMode),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18
+                    fontSize: 18,
                   )
                 ),
-                Padding(padding: const EdgeInsets.only(top: SPACING)),
                 Text(
-                  _getWinnerText(winner),
+                  '${_getWinnerText(replay.winner)} - ${replay.steps.length} steps',
                   style: TextStyle(fontSize: 16),
-                )
+                ),
+                Text(
+                  replay.date ?? '',
+                  style: TextStyle(fontSize: 16),
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -80,11 +83,11 @@ class ReplaysPage extends StatelessWidget {
     }
   }
   
-  void _showReplay(BuildContext context, Game game, GameMode gameMode) {
+  void _showReplay(BuildContext context, ReplayData replay) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => GamePage.replay(gameMode, game),
+        builder: (_) => GamePage.replay(replay.gameMode, replay.game),
         fullscreenDialog: true
       )
     );
@@ -92,18 +95,23 @@ class ReplaysPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gameDatas = Provider.of<GameStorageManager>(context).games?.replays ?? [];
-    final games = gameDatas.map((gameData) => Game.fromGameData(gameData)).toList();
+    final replays = Provider.of<GameStorageManager>(context).games?.replays ?? [];
+    final spotPainters = replays.map(_getSpotPainters).toList();
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Replays'),
       ),
-      body: ListView.builder(
-        itemExtent: BOARD_SIZE + 2 * SPACING,
-        itemCount: games.length,
-        itemBuilder: (context, i) => _buildGameListTile(context, games[i], gameDatas[i].gameMode, gameDatas[i].winner)
-      ),
+      body: ListView.separated(
+        itemCount: replays.length,
+        itemBuilder: (context, i) => _buildGameListTile(context, replays[i], spotPainters[i]),
+        separatorBuilder: (context, i) => Divider(
+          color: Colors.black45,
+          indent: SPACING,
+          height: 0,
+          endIndent: SPACING
+        ),
+      )
     );
   }
 }

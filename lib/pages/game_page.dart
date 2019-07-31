@@ -5,7 +5,9 @@ import 'package:connect_5/controllers/replay_controller.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/models/min_max_bot.dart';
+import 'package:connect_5/models/storable_games.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:connect_5/components/game_board.dart';
 import 'package:connect_5/controllers/game_controller.dart';
@@ -104,7 +106,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     if (!game.isFinished && game.steps.isNotEmpty) {
       // Game is not finished and not empty, save game
-      storageManager.saveLastGame(game.getGameData(gameMode));
+      storageManager.saveLastGame(GameData.fromGame(game, gameMode));
     } else {
       // Clear saved game
       storageManager.clearLastGame();
@@ -112,7 +114,9 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     if (game.isFinished) {
       // Save to replays
-      storageManager.saveReplay(game.getGameData(gameMode));
+      final date = DateTime.now();
+      final formattedDate = DateFormat('yyyy-MM-dd hh:mm:ss').format(date);
+      storageManager.saveReplay(ReplayData.fromGame(game, gameMode, formattedDate, game.winner?.side));
     }
   }
 

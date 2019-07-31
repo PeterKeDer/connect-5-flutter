@@ -188,7 +188,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
                 width: defaultBoardSize,
                 child: CustomPaint(
                   painter: BoardPainter(
-                    game: _controller.game,
+                    boardSize: _controller.game.board.size,
                     spotPainters: _controller.spotPainters
                   ),
                 ),

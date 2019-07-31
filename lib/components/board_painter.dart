@@ -8,18 +8,18 @@ class BoardPainter extends CustomPainter {
   static const double LINE_WIDTH = 1;
   static const double CORNER_RADIUS = 6;
   
-  final Game game;
+  final int boardSize;
   final List<List<BoardSpotPainter>> spotPainters;
   final double cornerRadius;
   final bool drawLines;
 
-  BoardPainter({this.game, this.spotPainters, this.drawLines = true, this.cornerRadius = CORNER_RADIUS});
+  BoardPainter({this.boardSize, this.spotPainters, this.drawLines = true, this.cornerRadius = CORNER_RADIUS});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final boardSize = size.width;
+    final boardSideLength = size.width;
 
-    final boardRect = Rect.fromLTWH(0, 0, boardSize, boardSize);
+    final boardRect = Rect.fromLTWH(0, 0, boardSideLength, boardSideLength);
     
     final boardRRect = RRect.fromRectAndRadius(boardRect, Radius.circular(cornerRadius));
     
@@ -35,7 +35,7 @@ class BoardPainter extends CustomPainter {
       ..color = Color.fromRGBO(90, 90, 100, 1);
 
     // Size of each box, including width of the line
-    final boxSize = boardSize / (game.board.size + 1);
+    final boxSize = boardSideLength / (boardSize + 1);
 
     // Get the center of piece with x and y on board, with optionally additional dx dy
     Offset getCenter(int x, int y, {double dx = 0, double dy = 0}) =>
@@ -43,26 +43,26 @@ class BoardPainter extends CustomPainter {
       Offset((x + 1) * boxSize + dx, (y + 1) * boxSize + dy);
 
     if (drawLines) {
-      for (var i=0; i<game.board.size; i++) {
+      for (var i=0; i<boardSize; i++) {
         final halfLineWidth = LINE_WIDTH / 2;
         // Horizontal line
         canvas.drawLine(
           getCenter(0, i, dx: -halfLineWidth),
-          getCenter(game.board.size - 1, i, dx: halfLineWidth),
+          getCenter(boardSize - 1, i, dx: halfLineWidth),
           linePaint
         );
 
         // Vertical line
         canvas.drawLine(
           getCenter(i, 0, dy: -halfLineWidth),
-          getCenter(i, game.board.size - 1, dy: halfLineWidth),
+          getCenter(i, boardSize - 1, dy: halfLineWidth),
           linePaint
         );
       }
     }
 
-    for (int x=0; x<game.board.size; x++) {
-      for (int y=0; y<game.board.size; y++) {
+    for (int x=0; x<boardSize; x++) {
+      for (int y=0; y<boardSize; y++) {
         spotPainters[x][y].paint(canvas, getCenter(x, y), boxSize);
       }
     }

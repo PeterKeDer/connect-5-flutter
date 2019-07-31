@@ -29,7 +29,7 @@ class _StartPageState extends State<StartPage> {
 
   void _handleContinueGameButtonPressed() {
     final gameData = Provider.of<GameStorageManager>(context).games.lastGame;
-    _startGame(gameData.gameMode, game: Game.fromGameData(gameData));
+    _startGame(gameData.gameMode, game: gameData.game);
   }
 
   void _handleNewGameButtonPressed() {
@@ -105,7 +105,6 @@ class _StartPageState extends State<StartPage> {
                     children: <Widget>[
                       _buildButton('Continue Game', storageManger.games?.lastGame == null ? null : _handleContinueGameButtonPressed),
                       _buildButton('New Game', _handleNewGameButtonPressed),
-                      _buildButton('Multiplayer', null),
                       _buildButton('Replays', _handleReplaysButtonPressed),
                     ],
                   ),

@@ -102,16 +102,6 @@ class Game {
     steps.forEach(addStep);
   }
 
-  /// Initialize game from GameData (used for persistent storage)
-  factory Game.fromGameData(GameData data) => Game.fromSteps(
-    data.steps,
-    size: data.boardSize,
-    initialSide: data.initialSide
-  );
-
-  /// Get GameData from game
-  GameData getGameData(GameMode gameMode) => GameData(board.size, initialSide, steps, gameMode, winner?.side);
-
   /// Add a step, throws spotTaken error if spot is not empty
   void addStep(Point point, {bool addToSteps = true}) {
     if (board.getSpot(point) != BoardSpot.empty) {

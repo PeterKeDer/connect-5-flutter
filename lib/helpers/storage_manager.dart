@@ -50,11 +50,11 @@ class GameStorageManager extends ChangeNotifier {
   /// Clear the last game
   void clearLastGame() => saveLastGame(null);
 
-  void saveReplay(GameData gameData) {
+  void saveReplay(ReplayData replay) {
     if (games.replays.length >= MAX_REPLAYS) {
       games.replays.removeLast();
     }
-    games.replays.insert(0, gameData);
+    games.replays.insert(0, replay);
     _writeGames();
 
     notifyListeners();
