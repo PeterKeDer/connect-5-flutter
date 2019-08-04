@@ -1,3 +1,4 @@
+import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_5/controllers/game_controller.dart';
@@ -5,15 +6,16 @@ import 'package:connect_5/models/game.dart';
 
 class LocalTwoPlayerGameController extends GameController with BoardSpotPaintersMixin {
   Game game;
+  final Settings settings;
   final TickerProvider tickerProvider;
 
   GameMode get gameMode => GameMode.twoPlayers;
 
-  LocalTwoPlayerGameController(this.game, this.tickerProvider) {
+  LocalTwoPlayerGameController(this.game, this.settings, this.tickerProvider) {
     initBoardSpotPainters();
 
     if (game.steps.isNotEmpty) {
-      highlightPoints([game.steps.last]);
+      highlightLastStep(game.steps.last);
     }
   }
 
@@ -34,11 +36,12 @@ class LocalTwoPlayerGameController extends GameController with BoardSpotPainters
       addPiece(point, prevSide);
       
       removeHighlights();
-      highlightPoints([point]);
       
       final winner = game.winner;
-      if (winner != null) {
-        highlightPoints(winner.points);
+      if (winner != null && settings.shouldHighlightWinningMoves) {
+        highlightWinningMoves(winner.points);
+      } else {
+        highlightLastStep(point);
       }
 
       gameEventListener();

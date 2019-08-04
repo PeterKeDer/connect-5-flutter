@@ -2,6 +2,7 @@ import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/components/status_bar.dart';
 import 'package:connect_5/controllers/local_bot.dart';
 import 'package:connect_5/controllers/replay_controller.dart';
+import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/models/min_max_bot.dart';
@@ -39,24 +40,29 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _startGame(widget.game ?? Game.createNew(15));
+    // Future delayed to be able to use context
+    Future.delayed(Duration.zero).then((_) {
+      _startGame(widget.game ?? Game.createNew(15));
+    });
   }
 
   void _startGame(Game game) {
+    final settings = Provider.of<SettingsManager>(context);
+
     GameController newController;
 
     if (widget.isReplay) {
-      newController = ReplayGameController(widget.game, gameMode, this);
+      newController = ReplayGameController(widget.game, gameMode, settings, this);
     } else {
       switch (gameMode) {
       case GameMode.twoPlayers:
-        newController = LocalTwoPlayerGameController(game, this);
+        newController = LocalTwoPlayerGameController(game, settings, this);
         break;
       case GameMode.blackBot:
-        newController = LocalBotGameController(game, MinMaxBot(), Side.black, this);
+        newController = LocalBotGameController(game, MinMaxBot(), Side.black, settings, this);
         break;
       case GameMode.whiteBot:
-        newController = LocalBotGameController(game, MinMaxBot(), Side.white, this);
+        newController = LocalBotGameController(game, MinMaxBot(), Side.white, settings, this);
         break;
       }
     }

@@ -1,7 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsManager extends ChangeNotifier {
+abstract class Settings {
+  bool get shouldDoubleTapConfirm;
+  bool get shouldHighlightLastStep;
+  bool get shouldHighlightWinningMoves;
+}
+
+class SettingsManager extends ChangeNotifier implements Settings {
   static const DOUBLE_TAP_CONFIRM_KEY = 'DOUBLE_TAP_CONFIRM_KEY';
   static const HIGHLIGHT_LAST_STEP_KEY = 'HIGHLIGHT_LAST_STEP_KEY';
   static const HIGHLIGHT_WINNING_MOVES_KEY = 'HIGHLIGHT_WINNING_MOVES_KEY';
@@ -38,7 +44,7 @@ class SettingsManager extends ChangeNotifier {
   bool _shouldHighlightLastStep = true;
 
   bool get shouldHighlightLastStep {
-    return true;
+    return _shouldHighlightLastStep;
   }
 
   set shouldHighlightLastStep(bool value) {

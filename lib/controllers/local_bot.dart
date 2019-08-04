@@ -1,3 +1,4 @@
+import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/models/game_bot.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/material.dart';
@@ -10,17 +11,18 @@ class LocalBotGameController extends GameController with BoardSpotPaintersMixin 
   Game game;
   GameBot bot;
   Side botSide;
+  final Settings settings;
   final TickerProvider tickerProvider;
 
   GameMode get gameMode => botSide == Side.black ? GameMode.blackBot : GameMode.whiteBot;
 
-  LocalBotGameController(this.game, this.bot, this.botSide, this.tickerProvider) {
+  LocalBotGameController(this.game, this.bot, this.botSide, this.settings, this.tickerProvider) {
     initBoardSpotPainters();
 
     bot.initialize(game, botSide);
 
     if (game.steps.isNotEmpty) {
-      highlightPoints([game.steps.last]);
+      highlightLastStep(game.steps.last);
     }
 
     if (game.currentSide == botSide) {
@@ -68,11 +70,12 @@ class LocalBotGameController extends GameController with BoardSpotPaintersMixin 
       bot.notifyMove(point, prevSide);
       
       removeHighlights();
-      highlightPoints([point]);
-      
+
       final winner = game.winner;
       if (winner != null) {
-        highlightPoints(winner.points);
+        highlightWinningMoves(game.winner.points);
+      } else {
+        highlightLastStep(point);
       }
 
       gameEventListener();

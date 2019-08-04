@@ -1,3 +1,4 @@
+import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_5/components/board_spot_painter.dart';
@@ -7,6 +8,7 @@ abstract class GameController extends ChangeNotifier {
   Game get game;
   GameMode get gameMode;
   TickerProvider get tickerProvider;
+  Settings get settings;
   List<List<BoardSpotPainter>> spotPainters;
 
   // Handle events
@@ -21,7 +23,7 @@ abstract class GameController extends ChangeNotifier {
 }
 
 mixin BoardSpotPaintersMixin on GameController {
-  bool isDoubleTapConfirmationEnabled = true; 
+  bool get isDoubleTapConfirmationEnabled => settings.shouldDoubleTapConfirm;
 
   Point _sp;
   Point get selectedPoint => _sp;
@@ -97,7 +99,19 @@ mixin BoardSpotPaintersMixin on GameController {
     spotPainters[point.x][point.y].removeTargetAnimated();
   }
 
-  void highlightPoints(List<Point> points) {
+  void highlightWinningMoves(List<Point> points) {
+    if (settings.shouldHighlightWinningMoves) {
+      _highlightPoints(points);
+    }
+  }
+
+  void highlightLastStep(Point point) {
+    if (settings.shouldHighlightLastStep) {
+      _highlightPoints([point]);
+    }
+  }
+
+  void _highlightPoints(List<Point> points) {
     for (final point in points) {
       spotPainters[point.x][point.y].addHighlightAnimated();
     }

@@ -1,4 +1,5 @@
 import 'package:connect_5/controllers/game_controller.dart';
+import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,9 +10,10 @@ class ReplayGameController extends GameController with BoardSpotPaintersMixin {
   GameMode gameMode;
   var currentStep = 0;
 
+  final Settings settings;
   final TickerProvider tickerProvider;
 
-  ReplayGameController(this.originalGame, this.gameMode, this.tickerProvider)
+  ReplayGameController(this.originalGame, this.gameMode, this.settings, this.tickerProvider)
     : game = Game.createNew(originalGame.board.size, initialSide: originalGame.initialSide)
   {
     initBoardSpotPainters();
@@ -24,7 +26,6 @@ class ReplayGameController extends GameController with BoardSpotPaintersMixin {
       final prevSide = game.currentSide;
 
       removeHighlights();
-      highlightPoints([point]);
 
       game.addStep(point);
       addPiece(point, prevSide);
@@ -35,8 +36,10 @@ class ReplayGameController extends GameController with BoardSpotPaintersMixin {
         // Replay is finished
         final winner = originalGame.winner;
         if (winner != null) {
-          highlightPoints(winner.points);
+          highlightWinningMoves(winner.points);
         }
+      } else {
+        highlightLastStep(point);
       }
 
       notifyListeners();
