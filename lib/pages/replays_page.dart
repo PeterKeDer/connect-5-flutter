@@ -12,6 +12,9 @@ class ReplaysPage extends StatelessWidget {
   static const double BOARD_SIZE = 80;
   static const double SPACING = 15;
 
+  static const TITLE_TEXT_STYLE = TextStyle(fontWeight: FontWeight.bold, fontSize: 18);
+  static const DEFAULT_TEXT_STYLE = TextStyle(fontSize: 16);
+
   List<List<BoardSpotPainter>> _getSpotPainters(ReplayData replay) {
     // Never animated, so ticker provider null is ok
     final spotPainters = List.generate(replay.boardSize, (_) =>
@@ -53,18 +56,19 @@ class ReplaysPage extends StatelessWidget {
               children: <Widget>[
                 Text(
                   getString(replay.gameMode),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  )
+                  style: TITLE_TEXT_STYLE,
+                ),
+                Text(
+                  '${replay.boardSize} x ${replay.boardSize}',
+                  style: DEFAULT_TEXT_STYLE,
                 ),
                 Text(
                   '${_getWinnerText(replay.winner)} - ${replay.steps.length} steps',
-                  style: TextStyle(fontSize: 16),
+                  style: DEFAULT_TEXT_STYLE,
                 ),
                 Text(
                   replay.date ?? '',
-                  style: TextStyle(fontSize: 16),
+                  style: DEFAULT_TEXT_STYLE,
                 ),
               ],
             ),

@@ -32,6 +32,19 @@ class SettingsPage extends StatelessWidget {
                 title: Text('Highlight Winning Moves'),
                 onChanged: (value) => settingsManager.shouldHighlightWinningMoves = value,
               ),
+              ListTile(
+                subtitle: Text('Game'),
+              ),
+              ListTile(
+                title: Text('Board Size: ${settingsManager.boardSize}'),
+                subtitle: Slider.adaptive(
+                  divisions: SettingsManager.MAX_BOARD_SIZE - SettingsManager.MIN_BOARD_SIZE,
+                  min: SettingsManager.MIN_BOARD_SIZE.toDouble(),
+                  max: SettingsManager.MAX_BOARD_SIZE.toDouble(),
+                  value: settingsManager.boardSize.toDouble(),
+                  onChanged: (value) => settingsManager.boardSize = value.round(),
+                ),
+              )
             ],
           )
         : Center(

@@ -42,7 +42,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     // Future delayed to be able to use context
     Future.delayed(Duration.zero).then((_) {
-      _startGame(widget.game ?? Game.createNew(15));
+      _startGame(widget.game ?? _createNewGame());
     });
   }
 
@@ -74,10 +74,15 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     });
   }
 
+  Game _createNewGame() {
+    final boardSize = Provider.of<SettingsManager>(context).boardSize;
+    return Game.createNew(boardSize);
+  }
+
   void _handleRestartGame() {
     if (!widget.isReplay) {
       Provider.of<GameStorageManager>(context).clearLastGame();
-      _startGame(Game.createNew(15));
+      _startGame(_createNewGame());
     } else {
       _startGame(widget.game);
     }
