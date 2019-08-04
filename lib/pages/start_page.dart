@@ -4,6 +4,7 @@ import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/pages/game_page.dart';
 import 'package:connect_5/pages/replays_page.dart';
+import 'package:connect_5/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -72,7 +73,12 @@ class _StartPageState extends State<StartPage> {
   }
 
   void _handleSettingsButtonTapped() {
-
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SettingsPage()
+      )
+    );
   }
 
   @override
