@@ -133,6 +133,10 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    if (gameController == null) {
+      return Container();
+    }
+
     return ChangeNotifierProvider<GameController>.value(
       value: gameController,
       child: Scaffold(

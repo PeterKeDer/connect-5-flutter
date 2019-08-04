@@ -5,8 +5,10 @@ import 'package:flutter/widgets.dart';
 class BoardSpotPainter extends ChangeNotifier {
   // Constants
   static const ANIMATION_DURATION = Duration(milliseconds: 150);
-  static const double TARGET_STROKE_WIDTH = 2;
-  static const double HIGHLIGHT_STROKE_WIDTH = 2;
+  static const double PIECE_SIZE_RATIO = 0.8;
+  static const double TRANSPARENT_PIECE_PROGRESS = 0.8;
+  static const double TARGET_STROKE_WIDTH_RATIO = 0.1;
+  static const double HIGHLIGHT_STROKE_WIDTH_RATIO = 0.1;
 
   final TickerProvider tickerProvider;
 
@@ -23,7 +25,7 @@ class BoardSpotPainter extends ChangeNotifier {
 
   void addTransparentPieceAnimated(Side side) {
     _pieceSide = side;
-    _animatePiece(0.8);
+    _animatePiece(TRANSPARENT_PIECE_PROGRESS);
   }
 
   void addPieceAnimated(Side side) {
@@ -57,9 +59,8 @@ class BoardSpotPainter extends ChangeNotifier {
   
   final _targetPaint = Paint()
     ..color = Colors.red.withAlpha(200)
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = TARGET_STROKE_WIDTH;
-  
+    ..style = PaintingStyle.stroke;
+
   AnimationController _targetController;
   Animation<double> _targetAnimation;
 
@@ -84,8 +85,7 @@ class BoardSpotPainter extends ChangeNotifier {
 
   final Paint _highlightPaint = Paint()
     ..color = Colors.orange
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = HIGHLIGHT_STROKE_WIDTH;
+    ..style = PaintingStyle.stroke;
 
   AnimationController _highlightController;
   Animation<double> _highlightAnimation;
@@ -115,12 +115,14 @@ class BoardSpotPainter extends ChangeNotifier {
       // Draw piece
       final color = _pieceSide == Side.black ? Colors.black : Colors.white;
       _piecePaint.color = color.withAlpha(_getAlpha(_pieceProgress));
-      canvas.drawCircle(center, 0.4 * boxSize * _pieceProgress, _piecePaint);
+      canvas.drawCircle(center, PIECE_SIZE_RATIO / 2 * boxSize * _pieceProgress, _piecePaint);
     }
 
     if (_targetProgress != 0) {
       // Draw target
-      final size = boxSize * 0.8 * _targetProgress;
+      final size = boxSize * PIECE_SIZE_RATIO * _targetProgress;
+
+      _targetPaint.strokeWidth = TARGET_STROKE_WIDTH_RATIO * boxSize;
       _targetPaint.color = Colors.red.withAlpha(_getAlpha(_targetProgress));
 
       final left = center.dx - size / 2;
@@ -152,9 +154,9 @@ class BoardSpotPainter extends ChangeNotifier {
 
     if (_highlightProgress != 0) {
       // Draw highlight
-      _highlightPaint.strokeWidth = HIGHLIGHT_STROKE_WIDTH * _highlightProgress;
+      _highlightPaint.strokeWidth = HIGHLIGHT_STROKE_WIDTH_RATIO * boxSize * _highlightProgress;
       _highlightPaint.color = Colors.orange.withAlpha(_getAlpha(_highlightProgress));
-      canvas.drawCircle(center, 0.4 * boxSize, _highlightPaint);
+      canvas.drawCircle(center, PIECE_SIZE_RATIO / 2 * boxSize, _highlightPaint);
     }
   }
 }
