@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class Settings {
@@ -17,22 +17,36 @@ class SettingsManager extends ChangeNotifier implements Settings {
   static const MIN_BOARD_SIZE = 9;
   static const MAX_BOARD_SIZE = 19;
 
+  static const APP_BRIGHTNESS_KEY = 'APP_BRIGHTNESS_KEY';
+  static const APP_BRIGHTNESS = {
+    'Light': Brightness.light,
+    'Dark': Brightness.dark
+  };
+
+  static const APP_ACCENT_KEY = 'APP_ACCENT_KEY';
+  static const APP_ACCENT = {
+    'Blue': Colors.blue,
+    'Red': Colors.red,
+    'Green': Colors.green,
+    'Orange': Colors.orange,
+    'Grey': Colors.grey
+  };
+
   SharedPreferences preferences;
 
-  bool isLoaded = false;
-
-  SettingsManager() {
-    SharedPreferences.getInstance().then(_initialize);
+  Future<void> initAsync() {
+    return SharedPreferences.getInstance().then(_initialize);
   }
 
   void _initialize(SharedPreferences preferences) {
     this.preferences = preferences;
-    isLoaded = true;
 
     _shouldDoubleTapConfirm = preferences.getBool(DOUBLE_TAP_CONFIRM_KEY) ?? true;
     _shouldHighlightLastStep = preferences.getBool(HIGHLIGHT_LAST_STEP_KEY) ?? true;
     _shouldHighlightWinningMoves = preferences.getBool(HIGHLIGHT_WINNING_MOVES_KEY) ?? true;
     _boardSize = preferences.getInt(BOARD_SIZE_KEY) ?? 15;
+    _appBrightnessString = preferences.getString(APP_BRIGHTNESS_KEY) ?? APP_BRIGHTNESS.keys.first;
+    _appAccentString = preferences.getString(APP_ACCENT_KEY) ?? APP_ACCENT.keys.first;
 
     notifyListeners();
   }
@@ -77,5 +91,30 @@ class SettingsManager extends ChangeNotifier implements Settings {
       preferences.setInt(BOARD_SIZE_KEY , value);
       notifyListeners();
     }
+  }
+
+  ThemeData get appTheme => ThemeData(
+    brightness: APP_BRIGHTNESS[_appBrightnessString],
+    primarySwatch: APP_ACCENT[_appAccentString],
+  );
+
+  String _appBrightnessString;
+
+  String get appBrightnessString => _appBrightnessString;
+
+  set appBrightnessString(String value) {
+    _appBrightnessString = value;
+    preferences.setString(APP_BRIGHTNESS_KEY, value);
+    notifyListeners();
+  }
+
+  String _appAccentString;
+
+  String get appAccentString => _appAccentString;
+
+  set appAccentString(String value) {
+    _appAccentString = value;
+    preferences.setString(APP_ACCENT_KEY, value);
+    notifyListeners();
   }
 }

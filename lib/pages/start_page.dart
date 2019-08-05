@@ -37,7 +37,7 @@ class _StartPageState extends State<StartPage> {
     PopupActionSheet(
       title: 'Start New Game',
       items: LOCAL_GAME_MODES.map((gameMode) => PopupActionSheetItem(
-        leading: getIcon(gameMode),
+        leading: getIcon(gameMode, color: Theme.of(context).textTheme.caption.color),
         text: getString(gameMode),
         onTap: () => _startGame(gameMode)
       )).toList()

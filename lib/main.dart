@@ -6,24 +6,37 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 
-void main() => runApp(Connect5App());
+void main() async {
+  final settingsManager = SettingsManager();
+  final gameStorageManager = GameStorageManager();
+
+  await gameStorageManager.readGamesAsync();
+  await settingsManager.initAsync();
+
+  runApp(Connect5App(settingsManager, gameStorageManager));
+}
 
 class Connect5App extends StatelessWidget {
+  final SettingsManager settingsManager;
+  final GameStorageManager gameStorageManger;
+
+  Connect5App(this.settingsManager, this.gameStorageManger);
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays([]);
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<GameStorageManager>.value(value: GameStorageManager()),
-        ChangeNotifierProvider<SettingsManager>.value(value: SettingsManager()),
+        ChangeNotifierProvider<GameStorageManager>.value(value: gameStorageManger),
+        ChangeNotifierProvider<SettingsManager>.value(value: settingsManager),
       ],
-      child: MaterialApp(
-        title: 'Connect 5',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
+      child: Builder(
+        builder: (context) => MaterialApp(
+          title: 'Connect 5',
+          theme: Provider.of<SettingsManager>(context).appTheme,
+          home: StartPage(),
         ),
-        home: StartPage(),
       )
     );
   }

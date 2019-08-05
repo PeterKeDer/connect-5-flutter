@@ -13,10 +13,6 @@ class GameStorageManager extends ChangeNotifier {
 
   var games = StorableGames();
 
-  GameStorageManager() {
-    _readGames().then((_) => notifyListeners());
-  }
-
   /// Get the file where games are saved
   Future<File> get _gamesFile async {
     final directory = await getApplicationDocumentsDirectory();
@@ -68,7 +64,7 @@ class GameStorageManager extends ChangeNotifier {
   }
 
   /// Read from file to get saved games
-  Future<void> _readGames() async {
+  Future<void> readGamesAsync() async {
     final file = await _ensureGamesFile;
     final contentStr = await file.readAsString();
     games = StorableGames.fromJson(json.decode(contentStr));

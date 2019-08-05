@@ -21,7 +21,8 @@ Widget getIcon(GameMode gameMode, {double size = 25, Color color = Colors.black4
         height: size,
         width: size,
         decoration: BoxDecoration(
-          color: color,
+          color: Colors.black,
+          border: Border.all(color: color, width: 2),
           borderRadius: BorderRadius.circular(size / 2),
         ),
       );

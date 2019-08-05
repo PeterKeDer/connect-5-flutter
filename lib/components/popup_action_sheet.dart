@@ -31,7 +31,7 @@ class PopupActionSheet extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Text(
               title,
-            style: TextStyle(color: Colors.black45),
+              style: TextStyle(color: Theme.of(context).textTheme.caption.color),
             ),
           ),
 

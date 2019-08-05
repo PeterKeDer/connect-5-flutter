@@ -140,7 +140,6 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     return ChangeNotifierProvider<GameController>.value(
       value: gameController,
       child: Scaffold(
-        backgroundColor: const Color.fromRGBO(240, 240, 240, 1),
         body: SafeArea(
           child: Stack(
             children: <Widget>[

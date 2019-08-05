@@ -102,7 +102,7 @@ class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProvider
     return Container(
       height: BAR_HEIGHT,
       decoration: BoxDecoration(
-        color: Colors.lightBlue.withAlpha(180),
+        color: Theme.of(context).colorScheme.primary.withAlpha(180),
         borderRadius: BorderRadius.circular(BORDER_RADIUS),
       ),
       child: Padding(
@@ -110,7 +110,6 @@ class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProvider
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            // TODO: maybe animate this
             if (!gameController.game.isFinished)
               _buildPieceIndicator(gameController.game.currentSide),
             _buildStatusText(gameController),
