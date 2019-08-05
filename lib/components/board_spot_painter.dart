@@ -1,3 +1,4 @@
+import 'package:connect_5/components/board_painter.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -110,10 +111,10 @@ class BoardSpotPainter extends ChangeNotifier {
   int _getAlpha(double progress) => (progress * 255).floor();
 
   /// Paint the spot on the board given offset and box size
-  void paint(Canvas canvas, Offset center, double boxSize) {
+  void paint(Canvas canvas, Offset center, double boxSize, BoardTheme boardTheme) {
     if (_pieceProgress != 0) {
       // Draw piece
-      final color = _pieceSide == Side.black ? Colors.black : Colors.white;
+      final color = _pieceSide == Side.black ? boardTheme.blackPieceColor : boardTheme.whitePieceColor;
       _piecePaint.color = color.withAlpha(_getAlpha(_pieceProgress));
       canvas.drawCircle(center, PIECE_SIZE_RATIO / 2 * boxSize * _pieceProgress, _piecePaint);
     }
@@ -123,7 +124,7 @@ class BoardSpotPainter extends ChangeNotifier {
       final size = boxSize * PIECE_SIZE_RATIO * _targetProgress;
 
       _targetPaint.strokeWidth = TARGET_STROKE_WIDTH_RATIO * boxSize;
-      _targetPaint.color = Colors.red.withAlpha(_getAlpha(_targetProgress));
+      _targetPaint.color = boardTheme.targetColor.withAlpha(_getAlpha(_targetProgress));
 
       final left = center.dx - size / 2;
       final right = center.dx + size / 2;
@@ -155,7 +156,7 @@ class BoardSpotPainter extends ChangeNotifier {
     if (_highlightProgress != 0) {
       // Draw highlight
       _highlightPaint.strokeWidth = HIGHLIGHT_STROKE_WIDTH_RATIO * boxSize * _highlightProgress;
-      _highlightPaint.color = Colors.orange.withAlpha(_getAlpha(_highlightProgress));
+      _highlightPaint.color = boardTheme.highlightColor.withAlpha(_getAlpha(_highlightProgress));
       canvas.drawCircle(center, PIECE_SIZE_RATIO / 2 * boxSize, _highlightPaint);
     }
   }

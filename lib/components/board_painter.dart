@@ -1,8 +1,25 @@
 import 'package:connect_5/components/board_spot_painter.dart';
-import 'package:connect_5/models/game.dart';
 import 'package:flutter/material.dart';
 
 typedef void HandlerFunction<T>(T value);
+
+class BoardTheme {
+  final Color boardColor;
+  final Color lineColor;
+  final Color blackPieceColor;
+  final Color whitePieceColor;
+  final Color targetColor;
+  final Color highlightColor;
+
+  const BoardTheme({
+    this.boardColor = const Color.fromRGBO(240, 210, 180, 1),
+    this.lineColor = const Color.fromRGBO(90, 90, 90, 1),
+    this.blackPieceColor = Colors.black,
+    this.whitePieceColor = Colors.white,
+    this.targetColor = Colors.red,
+    this.highlightColor = Colors.orange,
+  });
+}
 
 class BoardPainter extends CustomPainter {
   static const double LINE_WIDTH_RATIO = 0.05;
@@ -12,8 +29,9 @@ class BoardPainter extends CustomPainter {
   final List<List<BoardSpotPainter>> spotPainters;
   final double cornerRadius;
   final bool drawLines;
+  final BoardTheme boardTheme;
 
-  BoardPainter({this.boardSize, this.spotPainters, this.drawLines = true, this.cornerRadius});
+  BoardPainter({this.boardSize, this.spotPainters, this.drawLines = true, this.cornerRadius, this.boardTheme = const BoardTheme()});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -27,7 +45,7 @@ class BoardPainter extends CustomPainter {
     final boardRRect = RRect.fromRectAndRadius(boardRect, Radius.circular(cornerRadius ?? CORNER_RADIUS_RATIO * boxSize));
     
     final boardPaint = Paint()
-      ..color = Color.fromRGBO(240, 210, 180, 1);
+      ..color = boardTheme.boardColor;
 
     canvas.drawRRect(boardRRect, boardPaint);
 
@@ -35,7 +53,7 @@ class BoardPainter extends CustomPainter {
 
     final linePaint = Paint()
       ..strokeWidth = LINE_WIDTH_RATIO * boxSize
-      ..color = Color.fromRGBO(90, 90, 100, 1);
+      ..color = boardTheme.lineColor;
 
     // Get the center of piece with x and y on board, with optionally additional dx dy
     Offset getCenter(int x, int y, {double dx = 0, double dy = 0}) =>
@@ -63,7 +81,7 @@ class BoardPainter extends CustomPainter {
 
     for (int x=0; x<boardSize; x++) {
       for (int y=0; y<boardSize; y++) {
-        spotPainters[x][y].paint(canvas, getCenter(x, y), boxSize);
+        spotPainters[x][y].paint(canvas, getCenter(x, y), boxSize, boardTheme);
       }
     }
   }
