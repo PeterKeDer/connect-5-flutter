@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 class PopupActionSheetItem {
   Widget leading;
   String text;
+  Widget trailing;
   VoidCallback onTap;
+  bool dismissAfterTap;
 
-  PopupActionSheetItem({this.leading, this.text, this.onTap});
+  PopupActionSheetItem({this.leading, this.text, this.trailing, this.onTap, this.dismissAfterTap = true});
 }
 
 class PopupActionSheet extends StatelessWidget {
@@ -39,8 +41,11 @@ class PopupActionSheet extends StatelessWidget {
           ListTile(
             leading: item.leading,
             title: Text(item.text),
+            trailing: item.trailing,
             onTap: () {
-              Navigator.pop(context);
+              if (item.dismissAfterTap) {
+                Navigator.pop(context);
+              }
               item.onTap();
             },
           )

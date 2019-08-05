@@ -1,3 +1,4 @@
+import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -39,38 +40,46 @@ class SettingsPage extends StatelessWidget {
             subtitle: Text('Game'),
           ),
           ListTile(
-            title: Text('Board Size: ${settingsManager.boardSize}'),
-            subtitle: Slider(
-              divisions: SettingsManager.MAX_BOARD_SIZE - SettingsManager.MIN_BOARD_SIZE,
-              min: SettingsManager.MIN_BOARD_SIZE.toDouble(),
-              max: SettingsManager.MAX_BOARD_SIZE.toDouble(),
-              value: settingsManager.boardSize.toDouble(),
-              onChanged: (value) => settingsManager.boardSize = value.round(),
-            ),
+            title: Text('Board Size'),
+            trailing: Text('${settingsManager.boardSize}'),
+          ),
+          Slider(
+            divisions: SettingsManager.MAX_BOARD_SIZE - SettingsManager.MIN_BOARD_SIZE,
+            min: SettingsManager.MIN_BOARD_SIZE.toDouble(),
+            max: SettingsManager.MAX_BOARD_SIZE.toDouble(),
+            value: settingsManager.boardSize.toDouble(),
+            onChanged: (value) => settingsManager.boardSize = value.round(),
           ),
           ListTile(
-            subtitle: Text('Brightness'),
-          ),
-          ...SettingsManager.APP_BRIGHTNESS.keys.map((brightness) =>
-            RadioListTile<String>(
-              value: brightness,
-              groupValue: settingsManager.appBrightnessString,
-              title: Text(brightness),
-              activeColor: primaryColor,
-              onChanged: (brightness) => settingsManager.appBrightnessString = brightness,
-            )
+            subtitle: Text('Appearance'),
           ),
           ListTile(
-            subtitle: Text('Accent'),
+            title: Text('Brightness'),
+            trailing: Text(settingsManager.appBrightnessString),
+            onTap: () => PopupActionSheet(
+              title: 'Choose Brightness',
+              items: SettingsManager.APP_BRIGHTNESS.keys.map((brightness) => 
+                PopupActionSheetItem(
+                  text: brightness,
+                  trailing: brightness == settingsManager.appBrightnessString ? Icon(Icons.check) : null,
+                  onTap: () => settingsManager.appBrightnessString = brightness,
+                )
+              ).toList(),
+            ).show(context),
           ),
-          ...SettingsManager.APP_ACCENT.keys.map((accent) =>
-            RadioListTile<String>(
-              value: accent,
-              groupValue: settingsManager.appAccentString,
-              title: Text(accent),
-              activeColor: primaryColor,
-              onChanged: (accent) => settingsManager.appAccentString = accent,
-            )
+          ListTile(
+            title: Text('Accent'),
+            trailing: Text(settingsManager.appAccentString),
+            onTap: () => PopupActionSheet(
+              title: 'Choose Accent',
+              items: SettingsManager.APP_ACCENT.keys.map((accent) => 
+                PopupActionSheetItem(
+                  text: accent,
+                  trailing: accent == settingsManager.appAccentString ? Icon(Icons.check) : null,
+                  onTap: () => settingsManager.appAccentString = accent,
+                )
+              ).toList(),
+            ).show(context),
           ),
         ],
       )
