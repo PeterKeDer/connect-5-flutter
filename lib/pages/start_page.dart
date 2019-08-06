@@ -9,13 +9,7 @@ import 'package:connect_5/pages/stats_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class StartPage extends StatefulWidget {
-  @override
-  _StartPageState createState() => _StartPageState();
-}
-
-class _StartPageState extends State<StartPage> {
-
+class StartPage extends StatelessWidget {
   Widget _buildButton(String title, VoidCallback onPressed) {
     return RaisedButton(
       child: Text(
@@ -29,24 +23,24 @@ class _StartPageState extends State<StartPage> {
     );
   }
 
-  void _handleContinueGameButtonPressed() {
+  void _handleContinueGameButtonPressed(BuildContext context) {
     final gameData = Provider.of<GameStorageManager>(context).games.lastGame;
-    _startGame(gameData.gameMode, game: gameData.game);
+    _startGame(context, gameData.gameMode, game: gameData.game);
   }
 
-  void _handleNewGameButtonPressed() {
+  void _handleNewGameButtonPressed(BuildContext context) {
     PopupActionSheet(
       title: 'Start New Game',
       items: LOCAL_GAME_MODES.map((gameMode) => PopupActionSheetItem(
         leading: getIcon(gameMode, color: Theme.of(context).textTheme.caption.color),
         text: getString(gameMode),
-        onTap: () => _startGame(gameMode)
+        onTap: () => _startGame(context, gameMode)
       )).toList()
     ).show(context);
   }
 
   /// Start a game with game mode, and optionally game (null for create new game)
-  void _startGame(GameMode gameMode, {Game game}) {
+  void _startGame(BuildContext context, GameMode gameMode, {Game game}) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -56,7 +50,7 @@ class _StartPageState extends State<StartPage> {
     );
   }
 
-  void _handleReplaysButtonPressed() {
+  void _handleReplaysButtonPressed(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -65,11 +59,11 @@ class _StartPageState extends State<StartPage> {
     );
   }
 
-  void _handleHelpButtonPressed() {
+  void _handleHelpButtonPressed(BuildContext context) {
 
   }
 
-  void _handleStatsButtonTapped() {
+  void _handleStatsButtonTapped(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -78,7 +72,7 @@ class _StartPageState extends State<StartPage> {
     );
   }
 
-  void _handleSettingsButtonTapped() {
+  void _handleSettingsButtonTapped(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -115,9 +109,12 @@ class _StartPageState extends State<StartPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      _buildButton('Continue Game', storageManger.games?.lastGame == null ? null : _handleContinueGameButtonPressed),
-                      _buildButton('New Game', _handleNewGameButtonPressed),
-                      _buildButton('Replays', _handleReplaysButtonPressed),
+                      _buildButton('Continue Game', storageManger.games?.lastGame == null
+                        ? null
+                        : () => _handleContinueGameButtonPressed(context)
+                      ),
+                      _buildButton('New Game', () => _handleNewGameButtonPressed(context)),
+                      _buildButton('Replays', () => _handleReplaysButtonPressed(context)),
                     ],
                   ),
                 ),
@@ -130,15 +127,15 @@ class _StartPageState extends State<StartPage> {
                 children: <Widget>[
                   IconButton(
                     icon: Icon(Icons.help),
-                    onPressed: _handleHelpButtonPressed,
+                    onPressed: () => _handleHelpButtonPressed(context),
                   ),
                   IconButton(
                     icon: Icon(Icons.assessment),
-                    onPressed: _handleStatsButtonTapped,
+                    onPressed: () => _handleStatsButtonTapped(context),
                   ),
                   IconButton(
                     icon: Icon(Icons.settings),
-                    onPressed: _handleSettingsButtonTapped,
+                    onPressed: () => _handleSettingsButtonTapped(context),
                   )
                 ],
               ),
