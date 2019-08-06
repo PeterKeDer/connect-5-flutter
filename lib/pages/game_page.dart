@@ -3,6 +3,7 @@ import 'package:connect_5/components/status_bar.dart';
 import 'package:connect_5/controllers/local_bot.dart';
 import 'package:connect_5/controllers/replay_controller.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
+import 'package:connect_5/helpers/stats_manager.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/models/min_max_bot.dart';
@@ -128,6 +129,8 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       final date = DateTime.now();
       final formattedDate = DateFormat('yyyy-MM-dd hh:mm:ss').format(date);
       storageManager.saveReplay(ReplayData.fromGame(game, gameMode, formattedDate, game.winner?.side));
+
+      Provider.of<StatsManager>(context).recordGame(gameMode, game);
     }
   }
 
