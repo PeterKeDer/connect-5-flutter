@@ -63,8 +63,6 @@ class StatsManager extends ChangeNotifier {
   }
 
   void recordGame(GameMode gameMode, Game game) {
-    print('recording game');
-
     _totalGamesPlayed.storedValue++;
 
     if (gameMode == GameMode.twoPlayers) {
@@ -111,7 +109,7 @@ class StatsManager extends ChangeNotifier {
         }
       }
     }
-    
+
     _save();
 
     notifyListeners();
