@@ -18,8 +18,8 @@ enum Side {
 Side sideFromString(String str) => Side.values.firstWhere((s) => s.toString() == str);
 
 class Point {
-  int x, y;
-  Point(this.x, this.y);
+  final int x, y;
+  const Point(this.x, this.y);
 
   bool operator ==(p) => p is Point && p.x == x && p.y == y;
   int get hashCode => x.hashCode ^ y.hashCode;

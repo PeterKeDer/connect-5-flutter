@@ -3,6 +3,7 @@ import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/pages/game_page.dart';
+import 'package:connect_5/pages/help_page.dart';
 import 'package:connect_5/pages/replays_page.dart';
 import 'package:connect_5/pages/settings_page.dart';
 import 'package:connect_5/pages/stats_page.dart';
@@ -60,7 +61,12 @@ class StartPage extends StatelessWidget {
   }
 
   void _handleHelpButtonPressed(BuildContext context) {
-
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HelpPage()
+      )
+    );
   }
 
   void _handleStatsButtonTapped(BuildContext context) {

@@ -93,6 +93,11 @@ class BoardSpotPainter extends ChangeNotifier {
 
   bool get isHighlighted => _highlightProgress != 0;
 
+  void addHighlight() {
+    _highlightProgress = 1;
+    notifyListeners();
+  }
+
   void addHighlightAnimated() => _animateHighlight(1);
   void removeHighlightAnimated() => _animateHighlight(0);
 
@@ -159,5 +164,19 @@ class BoardSpotPainter extends ChangeNotifier {
       _highlightPaint.color = boardTheme.highlightColor.withAlpha(_getAlpha(_highlightProgress));
       canvas.drawCircle(center, PIECE_SIZE_RATIO / 2 * boxSize, _highlightPaint);
     }
+  }
+
+  @override
+  void dispose() {
+    _pieceController?.dispose();
+    _pieceController = null;
+
+    _targetController?.dispose();
+    _targetController = null;
+
+    _highlightController?.dispose();
+    _highlightController = null;
+
+    super.dispose();
   }
 }
