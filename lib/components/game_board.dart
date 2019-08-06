@@ -1,6 +1,7 @@
 
 import 'dart:math' as math;
 
+import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_5/controllers/game_controller.dart';
 import 'package:connect_5/models/game.dart';
@@ -189,7 +190,8 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
                 child: CustomPaint(
                   painter: BoardPainter(
                     boardSize: _controller.game.board.size,
-                    spotPainters: _controller.spotPainters
+                    spotPainters: _controller.spotPainters,
+                    boardTheme: Provider.of<SettingsManager>(context).boardTheme,
                   ),
                 ),
               )

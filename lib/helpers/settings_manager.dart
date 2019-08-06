@@ -1,3 +1,4 @@
+import 'package:connect_5/components/board_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,11 +18,7 @@ class SettingsManager extends ChangeNotifier implements Settings {
   static const MIN_BOARD_SIZE = 9;
   static const MAX_BOARD_SIZE = 19;
 
-  static const APP_BRIGHTNESS_KEY = 'APP_BRIGHTNESS_KEY';
-  static const APP_BRIGHTNESS = {
-    'Light': Brightness.light,
-    'Dark': Brightness.dark
-  };
+  static const APP_DARK_MODE_KEY = 'APP_DARK_MODE_KEY';
 
   static const APP_ACCENT_KEY = 'APP_ACCENT_KEY';
   static const APP_ACCENT = {
@@ -32,6 +29,45 @@ class SettingsManager extends ChangeNotifier implements Settings {
     'Grey': Colors.grey
   };
 
+  static const BOARD_THEME_KEY = 'BOARD_THEME_KEY';
+  static const BOARD_THEME = {
+    'Classic': BoardTheme(),
+    'Classic Darker': BoardTheme(
+      boardColor: Color.fromRGBO(200, 180, 150, 1),
+      whitePieceColor: Color.fromRGBO(245, 245, 245, 1),
+      targetColor: Color.fromRGBO(210, 50, 50, 1),
+      highlightColor: Color.fromRGBO(220, 140, 0, 1),
+    ),
+    'Night': BoardTheme(
+      boardColor: Color.fromRGBO(15, 20, 25, 1),
+      lineColor: Color.fromRGBO(180, 190, 200, 1),
+      blackPieceColor: Color.fromRGBO(80, 90, 120, 1),
+      whitePieceColor: Color.fromRGBO(240, 245, 255, 1),
+      highlightColor: Color.fromRGBO(80, 200, 220, 1),
+      targetColor: Color.fromRGBO(100, 220, 200, 1),
+    ),
+    'Blue': BoardTheme(
+      boardColor: Color.fromRGBO(210, 220, 230, 1),
+      targetColor: Color.fromRGBO(20, 80, 255, 1),
+      highlightColor: Color.fromRGBO(90, 140, 255, 1),
+    ),
+    'Red': BoardTheme(
+      boardColor: Color.fromRGBO(240, 205, 200, 1),
+      targetColor: Color.fromRGBO(255, 50, 0, 1),
+      highlightColor: Color.fromRGBO(255, 100, 20, 1),
+    ),
+    'Green': BoardTheme(
+      boardColor: Color.fromRGBO(210, 220, 200, 1),
+      targetColor: Color.fromRGBO(50, 240, 120, 1),
+      highlightColor: Color.fromRGBO(120, 240, 120, 1),
+    ),
+    'Greyscale': BoardTheme(
+      boardColor: Color.fromRGBO(200, 200, 200, 1),
+      targetColor: Color.fromRGBO(120, 120, 120, 1),
+      highlightColor: Color.fromRGBO(120, 120, 120, 1),
+    ),
+  };
+  
   SharedPreferences preferences;
 
   Future<void> initAsync() {
@@ -45,8 +81,9 @@ class SettingsManager extends ChangeNotifier implements Settings {
     _shouldHighlightLastStep = preferences.getBool(HIGHLIGHT_LAST_STEP_KEY) ?? true;
     _shouldHighlightWinningMoves = preferences.getBool(HIGHLIGHT_WINNING_MOVES_KEY) ?? true;
     _boardSize = preferences.getInt(BOARD_SIZE_KEY) ?? 15;
-    _appBrightnessString = preferences.getString(APP_BRIGHTNESS_KEY) ?? APP_BRIGHTNESS.keys.first;
+    _isDarkMode = preferences.getBool(APP_DARK_MODE_KEY) ?? false;
     _appAccentString = preferences.getString(APP_ACCENT_KEY) ?? APP_ACCENT.keys.first;
+    _boardThemeString = preferences.getString(BOARD_THEME_KEY) ?? BOARD_THEME.keys.first;
 
     notifyListeners();
   }
@@ -94,17 +131,17 @@ class SettingsManager extends ChangeNotifier implements Settings {
   }
 
   ThemeData get appTheme => ThemeData(
-    brightness: APP_BRIGHTNESS[_appBrightnessString],
+    brightness: _isDarkMode ? Brightness.dark : Brightness.light,
     primarySwatch: APP_ACCENT[_appAccentString],
   );
 
-  String _appBrightnessString;
+  bool _isDarkMode;
 
-  String get appBrightnessString => _appBrightnessString;
+  bool get isDarkMode => _isDarkMode;
 
-  set appBrightnessString(String value) {
-    _appBrightnessString = value;
-    preferences.setString(APP_BRIGHTNESS_KEY, value);
+  set isDarkMode(bool value) {
+    _isDarkMode = value;
+    preferences.setBool(APP_DARK_MODE_KEY, value);
     notifyListeners();
   }
 
@@ -115,6 +152,18 @@ class SettingsManager extends ChangeNotifier implements Settings {
   set appAccentString(String value) {
     _appAccentString = value;
     preferences.setString(APP_ACCENT_KEY, value);
+    notifyListeners();
+  }
+
+  BoardTheme get boardTheme => BOARD_THEME[_boardThemeString];
+
+  String _boardThemeString;
+
+  String get boardThemeString => _boardThemeString;
+
+  set boardThemeString(String value) {
+    _boardThemeString = value;
+    preferences.setString(BOARD_THEME_KEY, value);
     notifyListeners();
   }
 }

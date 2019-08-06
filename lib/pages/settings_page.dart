@@ -1,9 +1,59 @@
-import 'package:connect_5/components/popup_action_sheet.dart';
+import 'package:connect_5/components/board_painter.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+enum SettingsOptionsType {
+  appAccent, boardTheme
+}
+
 class SettingsPage extends StatelessWidget {
+  void _showOptionsPage(BuildContext context, SettingsOptionsType type) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          final settingsManager = Provider.of<SettingsManager>(context);
+
+          Iterable<String> keys;
+          String title;
+          String current;
+          HandlerFunction<String> action;
+
+          switch (type) {
+            case SettingsOptionsType.appAccent:
+              keys = SettingsManager.APP_ACCENT.keys;
+              title = 'Accent';
+              current = settingsManager.appAccentString;
+              action = (value) => settingsManager.appAccentString = value;
+              break;
+            case SettingsOptionsType.boardTheme:
+              keys = SettingsManager.BOARD_THEME.keys;
+              title = 'Board Theme';
+              current = settingsManager.boardThemeString;
+              action = (value) => settingsManager.boardThemeString = value;
+              break;
+          }
+
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(title),
+            ),
+            body: ListView(
+              children: keys.map((key) =>
+                ListTile(
+                  title: Text(key),
+                  trailing: key == current ? Icon(Icons.check) : null,
+                  onTap: () => action(key),
+                )
+              ).toList()
+            ),
+          );
+        }
+      )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final settingsManager = Provider.of<SettingsManager>(context);
@@ -53,34 +103,22 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             subtitle: Text('Appearance'),
           ),
-          ListTile(
-            title: Text('Brightness'),
-            trailing: Text(settingsManager.appBrightnessString),
-            onTap: () => PopupActionSheet(
-              title: 'Choose Brightness',
-              items: SettingsManager.APP_BRIGHTNESS.keys.map((brightness) => 
-                PopupActionSheetItem(
-                  text: brightness,
-                  trailing: brightness == settingsManager.appBrightnessString ? Icon(Icons.check) : null,
-                  onTap: () => settingsManager.appBrightnessString = brightness,
-                )
-              ).toList(),
-            ).show(context),
+          SwitchListTile(
+            value: settingsManager.isDarkMode,
+            title: Text('Dark Mode'),
+            activeColor: primaryColor,
+            onChanged: (value) => settingsManager.isDarkMode = value,
           ),
           ListTile(
             title: Text('Accent'),
             trailing: Text(settingsManager.appAccentString),
-            onTap: () => PopupActionSheet(
-              title: 'Choose Accent',
-              items: SettingsManager.APP_ACCENT.keys.map((accent) => 
-                PopupActionSheetItem(
-                  text: accent,
-                  trailing: accent == settingsManager.appAccentString ? Icon(Icons.check) : null,
-                  onTap: () => settingsManager.appAccentString = accent,
-                )
-              ).toList(),
-            ).show(context),
+            onTap: () => _showOptionsPage(context, SettingsOptionsType.appAccent),
           ),
+          ListTile(
+            title: Text('Board Theme'),
+            trailing: Text(settingsManager.boardThemeString),
+            onTap: () => _showOptionsPage(context, SettingsOptionsType.boardTheme),
+          )
         ],
       )
     );

@@ -1,5 +1,6 @@
 import 'package:connect_5/components/board_painter.dart';
 import 'package:connect_5/components/board_spot_painter.dart';
+import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
@@ -47,6 +48,7 @@ class ReplaysPage extends StatelessWidget {
                     spotPainters: spotPainters,
                     cornerRadius: 3,
                     drawLines: false,
+                    boardTheme: Provider.of<SettingsManager>(context).boardTheme,
                   ),
                 ),
               ),
