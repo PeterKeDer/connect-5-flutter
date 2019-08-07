@@ -1,3 +1,4 @@
+import 'package:connect_5/app_localizations.dart';
 import 'package:connect_5/components/board_painter.dart';
 import 'package:connect_5/components/board_spot_painter.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
@@ -57,7 +58,7 @@ class ReplaysPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  getString(replay.gameMode),
+                  localize(context, getString(replay.gameMode)),
                   style: TITLE_TEXT_STYLE,
                 ),
                 Text(
@@ -65,7 +66,7 @@ class ReplaysPage extends StatelessWidget {
                   style: DEFAULT_TEXT_STYLE,
                 ),
                 Text(
-                  '${_getWinnerText(replay.winner)} - ${replay.steps.length} steps',
+                  '${localize(context, _getWinnerText(replay.winner))} - ${replay.steps.length} ${localize(context, 'steps')}',
                   style: DEFAULT_TEXT_STYLE,
                 ),
                 Text(
@@ -81,11 +82,11 @@ class ReplaysPage extends StatelessWidget {
   
   String _getWinnerText(Side winner) {
     if (winner == null) {
-      return 'Tie';
+      return 'tie';
     } else if (winner == Side.black) {
-      return 'Black Victory';
+      return 'black_victory';
     } else {
-      return 'White Victory';
+      return 'white_victory';
     }
   }
   
@@ -106,7 +107,7 @@ class ReplaysPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Replays'),
+        title: Text(localize(context, 'replays')),
       ),
       body: ListView.separated(
         itemCount: replays.length,

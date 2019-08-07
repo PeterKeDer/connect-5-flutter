@@ -1,3 +1,4 @@
+import 'package:connect_5/app_localizations.dart';
 import 'package:connect_5/helpers/stats_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,17 +10,17 @@ class StatsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Stats'),
+        title: Text(localize(context, 'stats')),
       ),
       body: ListView(
         children: <Widget>[
           ...statGroups.expand((statGroup) => [
             ListTile(
-              subtitle: Text(statGroup.title),
+              subtitle: Text(localize(context, statGroup.title)),
             ),
             ...statGroup.stats.map((stat) =>
               ListTile(
-                title: Text(stat.title),
+                title: Text(localize(context, stat.title)),
                 trailing: Text(stat.value),
               )
             ).toList()
@@ -27,20 +28,20 @@ class StatsPage extends StatelessWidget {
 
           ListTile(
             title: RaisedButton(
-              child: Text('Clear Stats'),
+              child: Text(localize(context, 'clear_stats')),
               onPressed: () => showDialog(
                 context: context,
                 child: AlertDialog(
-                  title: Text('Clear Stats'),
-                  content: Text('Are you sure you want to clear stats? They will be permanently deleted.'),
+                  title: Text(localize(context, 'clear_stats')),
+                  content: Text(localize(context, 'clear_stats_alert_message')),
                   actions: <Widget>[
                     FlatButton(
-                      child: Text('Cancel'),
+                      child: Text(localize(context, 'cancel')),
                       textColor: Theme.of(context).colorScheme.primary,
                       onPressed: () => Navigator.pop(context),
                     ),
                     FlatButton(
-                      child: Text('Confirm'),
+                      child: Text(localize(context, 'confirm')),
                       textColor: Theme.of(context).colorScheme.primary,
                       onPressed: () {
                         Provider.of<StatsManager>(context).clearStats();

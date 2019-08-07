@@ -1,3 +1,4 @@
+import 'package:connect_5/app_localizations.dart';
 import 'package:connect_5/components/board_painter.dart';
 import 'package:connect_5/components/board_spot_painter.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
@@ -123,14 +124,14 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Help'),
+        title: Text(localize(context, 'help')),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
             Text(
-              'Two players put down pieces on the board alternately. The first player who connects 5 pieces in a row wins.',
+              localize(context, 'help_message'),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.title
             ),
@@ -149,7 +150,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
               ),
             ),
             RaisedButton(
-              child: Text('Done'),
+              child: Text(localize(context, 'done')),
               onPressed: () => Navigator.pop(context),
             )
           ],

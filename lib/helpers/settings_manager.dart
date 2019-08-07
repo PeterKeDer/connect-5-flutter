@@ -10,6 +10,8 @@ abstract class Settings {
 }
 
 class SettingsManager extends ChangeNotifier implements Settings {
+  static const LOCALE_KEY = 'LOCALE_KEY';
+
   static const DOUBLE_TAP_CONFIRM_KEY = 'DOUBLE_TAP_CONFIRM_KEY';
   static const HIGHLIGHT_LAST_STEP_KEY = 'HIGHLIGHT_LAST_STEP_KEY';
   static const HIGHLIGHT_WINNING_MOVES_KEY = 'HIGHLIGHT_WINNING_MOVES_KEY';
@@ -22,23 +24,23 @@ class SettingsManager extends ChangeNotifier implements Settings {
 
   static const APP_ACCENT_KEY = 'APP_ACCENT_KEY';
   static const APP_ACCENT = {
-    'Blue': Colors.blue,
-    'Red': Colors.red,
-    'Green': Colors.green,
-    'Orange': Colors.orange,
-    'Grey': Colors.grey
+    'accent_blue': Colors.blue,
+    'accent_red': Colors.red,
+    'accent_green': Colors.green,
+    'accent_orange': Colors.orange,
+    'accent_grey': Colors.grey
   };
 
   static const BOARD_THEME_KEY = 'BOARD_THEME_KEY';
   static const BOARD_THEME = {
-    'Classic': BoardTheme(),
-    'Classic Darker': BoardTheme(
+    'board_theme_classic': BoardTheme(),
+    'board_theme_classic_darker': BoardTheme(
       boardColor: Color.fromRGBO(200, 180, 150, 1),
       whitePieceColor: Color.fromRGBO(245, 245, 245, 1),
       targetColor: Color.fromRGBO(210, 50, 50, 1),
       highlightColor: Color.fromRGBO(220, 140, 0, 1),
     ),
-    'Night': BoardTheme(
+    'board_theme_night': BoardTheme(
       boardColor: Color.fromRGBO(15, 20, 25, 1),
       lineColor: Color.fromRGBO(180, 190, 200, 1),
       blackPieceColor: Color.fromRGBO(80, 90, 120, 1),
@@ -46,22 +48,22 @@ class SettingsManager extends ChangeNotifier implements Settings {
       highlightColor: Color.fromRGBO(80, 200, 220, 1),
       targetColor: Color.fromRGBO(100, 220, 200, 1),
     ),
-    'Blue': BoardTheme(
+    'board_theme_blue': BoardTheme(
       boardColor: Color.fromRGBO(210, 220, 230, 1),
       targetColor: Color.fromRGBO(20, 80, 255, 1),
       highlightColor: Color.fromRGBO(90, 140, 255, 1),
     ),
-    'Red': BoardTheme(
+    'board_theme_red': BoardTheme(
       boardColor: Color.fromRGBO(240, 205, 200, 1),
       targetColor: Color.fromRGBO(255, 50, 0, 1),
       highlightColor: Color.fromRGBO(255, 100, 20, 1),
     ),
-    'Green': BoardTheme(
+    'board_theme_green': BoardTheme(
       boardColor: Color.fromRGBO(210, 220, 200, 1),
       targetColor: Color.fromRGBO(50, 240, 120, 1),
       highlightColor: Color.fromRGBO(120, 240, 120, 1),
     ),
-    'Greyscale': BoardTheme(
+    'board_theme_grey': BoardTheme(
       boardColor: Color.fromRGBO(200, 200, 200, 1),
       targetColor: Color.fromRGBO(120, 120, 120, 1),
       highlightColor: Color.fromRGBO(120, 120, 120, 1),
@@ -77,6 +79,7 @@ class SettingsManager extends ChangeNotifier implements Settings {
   void _initialize(SharedPreferences preferences) {
     this.preferences = preferences;
 
+    _localeString = preferences.getString(LOCALE_KEY); // No default value: should use system's default
     _shouldDoubleTapConfirm = preferences.getBool(DOUBLE_TAP_CONFIRM_KEY) ?? true;
     _shouldHighlightLastStep = preferences.getBool(HIGHLIGHT_LAST_STEP_KEY) ?? true;
     _shouldHighlightWinningMoves = preferences.getBool(HIGHLIGHT_WINNING_MOVES_KEY) ?? true;
@@ -85,6 +88,18 @@ class SettingsManager extends ChangeNotifier implements Settings {
     _appAccentString = preferences.getString(APP_ACCENT_KEY) ?? APP_ACCENT.keys.first;
     _boardThemeString = preferences.getString(BOARD_THEME_KEY) ?? BOARD_THEME.keys.first;
 
+    notifyListeners();
+  }
+
+  Locale get locale => _localeString != null ? Locale(_localeString) : null;
+
+  String _localeString;
+
+  String get localeString => _localeString;
+
+  set localeString(String value) {
+    _localeString = value;
+    preferences.setString(LOCALE_KEY, value);
     notifyListeners();
   }
 

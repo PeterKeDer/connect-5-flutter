@@ -1,3 +1,4 @@
+import 'package:connect_5/app_localizations.dart';
 import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/components/status_bar.dart';
 import 'package:connect_5/controllers/local_bot.dart';
@@ -94,12 +95,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       items: [
         PopupActionSheetItem(
           leading: const Icon(Icons.refresh),
-          text: 'Restart Game',
+          text: localize(context, 'restart_game'),
           onTap: _handleRestartGame
         ),
         PopupActionSheetItem(
           leading: const Icon(Icons.close),
-          text: 'Quit',
+          text: localize(context, 'quit'),
           onTap: () {
             Navigator.pop(context);
           },

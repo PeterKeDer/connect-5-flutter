@@ -43,11 +43,11 @@ Widget getIcon(GameMode gameMode, {double size = 25, Color color = Colors.black4
 String getString(GameMode gameMode) {
   switch (gameMode) {
     case GameMode.twoPlayers:
-      return 'Two Players';
+      return 'two_players';
     case GameMode.blackBot:
-      return 'Bot (Black)';
+      return 'bot_black';
     case GameMode.whiteBot:
-    return 'Bot (White)';
+    return 'bot_white';
   }
   return '';
 }

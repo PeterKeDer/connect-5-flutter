@@ -1,3 +1,4 @@
+import 'package:connect_5/app_localizations.dart';
 import 'package:connect_5/controllers/game_controller.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/models/game.dart';
@@ -66,11 +67,11 @@ class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProvider
   Widget _buildStatusText(GameController gameController) {
     String statusBarText;
     if (gameController.game.winner != null) {
-      statusBarText = gameController.game.winner.side == Side.black ? 'Black Victory!' : 'White Victory!';
+      statusBarText = localize(context, gameController.game.winner.side == Side.black ? 'black_victory' : 'white_victory');
     } else if (gameController.game.isFull) {
-      statusBarText = 'Tie!';
+      statusBarText = localize(context, 'tie');
     } else {
-      statusBarText = getString(gameController.gameMode);
+      statusBarText = localize(context, getString(gameController.gameMode));
     }
     
     return Text(

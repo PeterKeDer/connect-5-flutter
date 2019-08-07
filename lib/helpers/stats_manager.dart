@@ -42,21 +42,21 @@ class StatsManager extends ChangeNotifier {
 
   static const KEY_PREFIX = 'STATS_';
 
-  final _totalGamesPlayed = StoredStat('Total Games Played', 'TOTAL_GAMES_PLAYED');
-  final _totalBlackVictory = StoredStat('Total Black Victory', 'TOTAL_BLACK_VICTORY');
-  final _totalWhiteVictory = StoredStat('Total White Victory', 'TOTAL_WHITE_VICTORY');
+  final _totalGamesPlayed = StoredStat('total_games_played', 'TOTAL_GAMES_PLAYED');
+  final _totalBlackVictory = StoredStat('total_black_victory', 'TOTAL_BLACK_VICTORY');
+  final _totalWhiteVictory = StoredStat('total_white_victory', 'TOTAL_WHITE_VICTORY');
 
-  final _twoPlayersGamesPlayed = StoredStat('Games Played', 'TWO_PLAYERS_GAMES_PLAYED');
-  final _twoPlayersBlackVictory = StoredStat('Black Victory', 'TWO_PLAYERS_BLACK_VICTORY');
-  final _twoPlayersWhiteVictory = StoredStat('White Victory', 'TWO_PLAYERS_WHITE_VICTORY');
+  final _twoPlayersGamesPlayed = StoredStat('games_played', 'TWO_PLAYERS_GAMES_PLAYED');
+  final _twoPlayersBlackVictory = StoredStat('black_victory', 'TWO_PLAYERS_BLACK_VICTORY');
+  final _twoPlayersWhiteVictory = StoredStat('white_victory', 'TWO_PLAYERS_WHITE_VICTORY');
 
-  final _botBlackGamesPlayed = StoredStat('Games Played', 'BOT_BLACK_GAMES_PLAYED');
-  final _botBlackGamesWon = StoredStat('Games Won', 'BOT_BLACK_GAMES_WON');
-  final _botBlackGamesLost = StoredStat('Games Lost', 'BOT_BLACK_GAMES_LOST');
+  final _botBlackGamesPlayed = StoredStat('games_played', 'BOT_BLACK_GAMES_PLAYED');
+  final _botBlackGamesWon = StoredStat('games_won', 'BOT_BLACK_GAMES_WON');
+  final _botBlackGamesLost = StoredStat('games_lost', 'BOT_BLACK_GAMES_LOST');
 
-  final _botWhiteGamesPlayed = StoredStat('Games Played', 'BOT_WHITE_GAMES_PLAYED');
-  final _botWhiteGamesWon = StoredStat('Games Won', 'BOT_WHITE_GAMES_WON');
-  final _botWhiteGamesLost = StoredStat('Games Lost', 'BOT_WHITE_GAMES_LOST');
+  final _botWhiteGamesPlayed = StoredStat('games_played', 'BOT_WHITE_GAMES_PLAYED');
+  final _botWhiteGamesWon = StoredStat('games_won', 'BOT_WHITE_GAMES_WON');
+  final _botWhiteGamesLost = StoredStat('games_lost', 'BOT_WHITE_GAMES_LOST');
 
   Future<void> initAsync() {
     return SharedPreferences.getInstance().then(_initialize);
@@ -131,27 +131,27 @@ class StatsManager extends ChangeNotifier {
 
   void _initializeStatGroups() {
     statGroups = [
-      StatGroup('General', [
+      StatGroup('general', [
         _totalGamesPlayed,
         _totalBlackVictory,
         _totalWhiteVictory,
       ]),
-      StatGroup('Two Players', [
+      StatGroup('two_players', [
         _twoPlayersGamesPlayed,
         _twoPlayersBlackVictory,
         _twoPlayersWhiteVictory,
       ]),
-      StatGroup('Player vs Bot (Black)', [
+      StatGroup('player_vs_bot_black', [
         _botBlackGamesPlayed,
         _botBlackGamesWon,
         _botBlackGamesLost,
-        ComputedStat('Win Rate', () => _getWinRateString(_botBlackGamesWon.storedValue, _botBlackGamesPlayed.storedValue)),
+        ComputedStat('win_rate', () => _getWinRateString(_botBlackGamesWon.storedValue, _botBlackGamesPlayed.storedValue)),
       ]),
-      StatGroup('Player vs Bot (White)', [
+      StatGroup('player_vs_bot_white', [
         _botWhiteGamesPlayed,
         _botWhiteGamesWon,
         _botWhiteGamesLost,
-        ComputedStat('Win Rate', () => _getWinRateString(_botWhiteGamesWon.storedValue, _botWhiteGamesPlayed.storedValue)),
+        ComputedStat('win_rate', () => _getWinRateString(_botWhiteGamesWon.storedValue, _botWhiteGamesPlayed.storedValue)),
       ]),
     ];
   }

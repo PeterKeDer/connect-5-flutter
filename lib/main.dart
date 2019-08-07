@@ -1,10 +1,13 @@
+import 'package:connect_5/app_localizations.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/helpers/stats_manager.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
+import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/pages/start_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 
 void main() async {
@@ -41,6 +44,27 @@ class Connect5App extends StatelessWidget {
       child: Builder(
         builder: (context) => MaterialApp(
           title: 'Connect 5',
+          locale: Provider.of<SettingsManager>(context).locale,
+          localeResolutionCallback: (deviceLocale, supportedLocales) {
+            final settingsManager = Provider.of<SettingsManager>(context);
+            final savedLocale = settingsManager.locale;
+
+            if (
+              savedLocale == null
+              && SUPPORTED_LOCALES.firstWhere((locale) => locale.languageCode == deviceLocale.languageCode) != null
+            ) {
+              settingsManager.localeString = deviceLocale.languageCode;
+            }
+
+            return savedLocale ?? deviceLocale;
+          },
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            const AppLocalizationsDelegate(),
+          ],
+          supportedLocales: SUPPORTED_LOCALES,
           theme: Provider.of<SettingsManager>(context).appTheme,
           home: StartPage(),
         ),

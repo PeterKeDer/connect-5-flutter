@@ -1,3 +1,4 @@
+import 'package:connect_5/app_localizations.dart';
 import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game.dart';
@@ -31,10 +32,10 @@ class StartPage extends StatelessWidget {
 
   void _handleNewGameButtonPressed(BuildContext context) {
     PopupActionSheet(
-      title: 'Start New Game',
+      title: localize(context, 'start_new_game'),
       items: LOCAL_GAME_MODES.map((gameMode) => PopupActionSheetItem(
         leading: getIcon(gameMode, color: Theme.of(context).textTheme.caption.color),
-        text: getString(gameMode),
+        text: localize(context, getString(gameMode)),
         onTap: () => _startGame(context, gameMode)
       )).toList()
     ).show(context);
@@ -100,7 +101,8 @@ class StartPage extends StatelessWidget {
               left: 0,
               right: 0,
               child: Text(
-                'Connect 5',
+                // 'Connect 5',
+                localize(context, 'connect_5'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 36,
@@ -115,12 +117,12 @@ class StartPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      _buildButton('Continue Game', storageManger.games?.lastGame == null
+                      _buildButton(localize(context, 'continue_game'), storageManger.games?.lastGame == null
                         ? null
                         : () => _handleContinueGameButtonPressed(context)
                       ),
-                      _buildButton('New Game', () => _handleNewGameButtonPressed(context)),
-                      _buildButton('Replays', () => _handleReplaysButtonPressed(context)),
+                      _buildButton(localize(context, 'new_game'), () => _handleNewGameButtonPressed(context)),
+                      _buildButton(localize(context, 'replays'), () => _handleReplaysButtonPressed(context)),
                     ],
                   ),
                 ),
