@@ -50,6 +50,7 @@ const LOCALIZED_STRINGS = {
 
     // Replays
     'steps': 'steps',
+    'no_replays_message': 'There are currently no replays saved. Whenever you finish a game, it will be saved here.',
 
     // Stats
     'stats': 'Stats',
@@ -94,7 +95,7 @@ const LOCALIZED_STRINGS = {
     // Start menu
     'continue_game': '继续游戏',
     'new_game': '新游戏',
-    'replays': '游戏记录',
+    'replays': '游戏回放',
 
     // Settings
     'settings': '设置',
@@ -124,6 +125,7 @@ const LOCALIZED_STRINGS = {
 
     // Replays
     'steps': '步',
+    'no_replays_message': '目前没有任何游戏回放。当你完成一盘游戏时，它会被存在这里。',
 
     // Stats
     'stats': '数据',

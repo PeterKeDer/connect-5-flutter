@@ -109,16 +109,27 @@ class ReplaysPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(localize(context, 'replays')),
       ),
-      body: ListView.separated(
-        itemCount: replays.length,
-        itemBuilder: (context, i) => _buildGameListTile(context, replays[i], spotPainters[i]),
-        separatorBuilder: (context, i) => Divider(
-          color: Colors.black45,
-          indent: SPACING,
-          height: 0,
-          endIndent: SPACING
-        ),
-      )
+      body: replays.isNotEmpty
+        ? ListView.separated(
+          itemCount: replays.length,
+          itemBuilder: (context, i) => _buildGameListTile(context, replays[i], spotPainters[i]),
+          separatorBuilder: (context, i) => Divider(
+            color: Colors.black45,
+            indent: SPACING,
+            height: 0,
+            endIndent: SPACING
+          ),
+        )
+        : Center(
+          child: Padding(
+            padding: const EdgeInsets.all(SPACING),
+            child: Text(
+              localize(context, 'no_replays_message'),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.title
+            ),
+          ),
+        )
     );
   }
 }
