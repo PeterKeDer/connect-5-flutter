@@ -19,6 +19,9 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
 
   static const ANIMATION_DURATION = Duration(milliseconds: 150);
 
+  // Used to get center of the container, to improve zooming / dragging experience
+  final containerGlobalKey = GlobalKey();
+
   double get defaultBoardSize {
     final size = MediaQuery.of(context).size;
     return math.min(size.width, size.height) * 0.8;
@@ -35,6 +38,15 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
   /// Offset of board from center
   Offset _offset = Offset.zero;
   
+  /// The center of the container of the board
+  Offset _center;
+
+  /// The initial center of board, when scale begins
+  Offset _initialBoardCenter;
+
+  /// The last focal point where at least two fingers scale
+  Offset _lastScaleFocalPoint;
+
   /// Zoom when scale started
   double _initialZoom;
 
@@ -62,6 +74,10 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
       _initialZoom = _zoom;
       _initialFocalPoint = scale.focalPoint;
       _initialOffset = _offset;
+
+      final box = containerGlobalKey.currentContext.findRenderObject() as RenderBox;
+      _center = box.localToGlobal(Offset(box.size.width / 2, box.size.height / 2));
+      _initialBoardCenter = _center + _initialOffset;
     });
   }
 
@@ -69,41 +85,46 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     _controller.moveBoard();
 
     setState(() {
-      // Moving board, stop offset animation
+      // Moving board, stop animations
       _offsetAnimationController.stop();
+      _zoomAnimationController.stop();
 
       if (scale.scale == 1) {
         // Single finger zoom, only adjust center (reset zoom)
         _initialZoom = _zoom;
       } else {
-        // Scaling with two fingers, stop zoom animation
-        _zoomAnimationController.stop();
-        
         // Adjust zoom based on scale
         _zoom = _initialZoom * scale.scale;
+
+        _lastScaleFocalPoint = scale.focalPoint;
       }
 
       // Distance between current focal point and center 
       // = scale * distance between initial center and initial focal point
-      // _center = scale.focalPoint - (_initialFocalPoint - _initialCenter) * scale.scale;
-
-      // TODO: improve this maybe
-      _offset = scale.focalPoint - _initialFocalPoint + _initialOffset;
+      _offset = scale.focalPoint - (_initialFocalPoint - _initialBoardCenter) * scale.scale - _center;
     });
   }
 
   void _handleScaleEnd(ScaleEndDetails scale) {
     // Animate zoom if bigger than max / smaller than min
+    double newZoom = _zoom;
     if (_zoom > MAX_ZOOM) {
+      newZoom = MAX_ZOOM;
       _animateZoom(MAX_ZOOM);
     } else if (_zoom < MIN_ZOOM) {
+      newZoom = MIN_ZOOM;
       _animateZoom(MIN_ZOOM);
     }
 
-    // Animate offset if board is too far from center
-    final halfBoardSize = defaultBoardSize * _zoom / 2;
-    final dx = math.max(-halfBoardSize, math.min(halfBoardSize, _offset.dx));
-    final dy = math.max(-halfBoardSize, math.min(halfBoardSize, _offset.dy));
+    // The distance between focal point and board center scales to new zoom
+    final boardCenter = _offset + _center;
+    final newBoardCenter = (boardCenter - _lastScaleFocalPoint) / _zoom * newZoom + _lastScaleFocalPoint;
+    final newOffset = newBoardCenter - _center;
+
+    // Change offset if board is too far from center
+    final halfBoardSize = defaultBoardSize * newZoom / 2;
+    final dx = math.max(-halfBoardSize, math.min(halfBoardSize, newOffset.dx));
+    final dy = math.max(-halfBoardSize, math.min(halfBoardSize, newOffset.dy));
 
     if (dx != _offset.dx || dy != _offset.dy) {
       _animateOffset(Offset(dx, dy));
@@ -178,6 +199,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
       onScaleEnd: _handleScaleEnd,
       onTapUp: _handleTapUp,
       child: Container(
+        key: containerGlobalKey,
         color: Colors.transparent, // needed for gesture to activate on background
         child: Center(
           child: Transform(
