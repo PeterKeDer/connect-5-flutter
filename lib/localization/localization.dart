@@ -11,11 +11,19 @@ class AppLocale {
 
 const SUPPORTED_LOCALES = [
   AppLocale('English', Locale('en')),
-  AppLocale('简体中文', Locale('zh')),
+  AppLocale('简体中文', Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans')),
+  AppLocale('繁體中文', Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant')),
 ];
 
-bool isLocaleSupported(String languageCode) {
-  return SUPPORTED_LOCALES.firstWhere((l) => l.locale.languageCode == languageCode) != null;
+bool isLanguageCodeSupported(String languageCode) {
+  return SUPPORTED_LOCALES.firstWhere((l) => l.locale.languageCode == languageCode, orElse: () => null) != null;
+}
+
+bool isLocaleSupported(Locale locale) {
+  return SUPPORTED_LOCALES.firstWhere(
+    (l) => l.locale.languageCode == locale.languageCode && l.locale.scriptCode == locale.scriptCode,
+    orElse: () => null
+  ) != null;
 }
 
 // See https://flutter.dev/docs/development/accessibility-and-localization/internationalization#alternative-class
@@ -23,23 +31,29 @@ bool isLocaleSupported(String languageCode) {
 /// Localize a string to the app's current locale
 String localize(BuildContext context, String str) => AppLocalizations.of(context).localize(str);
 
+String getLocaleString(Locale locale) => locale.scriptCode == null
+  ? locale.languageCode
+  : '${locale.languageCode}_${locale.scriptCode}';
+
 class AppLocalizations {
-  AppLocalizations(this.locale);
+  AppLocalizations(this.locale)
+    : localeKey = isLocaleSupported(locale) ? getLocaleString(locale) : locale.languageCode;
 
   final Locale locale;
+  final String localeKey;
 
   static AppLocalizations of(BuildContext context) {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  String localize(String str) => LOCALIZED_STRINGS[locale.languageCode][str] ?? str;
+  String localize(String str) => LOCALIZED_STRINGS[localeKey][str] ?? str;
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) => isLocaleSupported(locale.languageCode);
+  bool isSupported(Locale locale) => isLanguageCodeSupported(locale.languageCode);
 
   @override
   Future<AppLocalizations> load(Locale locale) {

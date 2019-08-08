@@ -48,8 +48,17 @@ class Connect5App extends StatelessWidget {
             final settingsManager = Provider.of<SettingsManager>(context);
             final savedLocale = settingsManager.locale;
 
-            if (savedLocale == null && isLocaleSupported(deviceLocale.languageCode)) {
-              settingsManager.localeString = deviceLocale.languageCode;
+            if (savedLocale == null) {
+              Future.delayed(Duration.zero, () {
+                // Choose best supported locale to match
+                if (isLocaleSupported(deviceLocale)) {
+                  settingsManager.localeString = getLocaleString(deviceLocale);
+                } else if (isLanguageCodeSupported(deviceLocale.languageCode)) {
+                  settingsManager.localeString = deviceLocale.languageCode;
+                } else {
+                  settingsManager.localeString = 'en';
+                }
+              });
             }
 
             return savedLocale ?? deviceLocale;

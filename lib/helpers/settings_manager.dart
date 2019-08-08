@@ -1,4 +1,5 @@
 import 'package:connect_5/components/board_painter.dart';
+import 'package:connect_5/localization/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -91,7 +92,7 @@ class SettingsManager extends ChangeNotifier implements Settings {
     notifyListeners();
   }
 
-  Locale get locale => _localeString != null ? Locale(_localeString) : null;
+  Locale get locale => SUPPORTED_LOCALES.firstWhere((l) => l.locale.toString() == _localeString, orElse: () => null)?.locale;
 
   String _localeString;
 

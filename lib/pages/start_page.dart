@@ -102,7 +102,6 @@ class StartPage extends StatelessWidget {
               left: 0,
               right: 0,
               child: Text(
-                // 'Connect 5',
                 localize(context, 'connect_5'),
                 textAlign: TextAlign.center,
                 style: TextStyle(

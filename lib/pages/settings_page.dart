@@ -24,10 +24,10 @@ class SettingsPage extends StatelessWidget {
 
           switch (type) {
             case SettingsOptionsType.locale:
-              keys = SUPPORTED_LOCALES.map((locale) => locale.locale.languageCode).toList();
+              keys = SUPPORTED_LOCALES.map((locale) => locale.locale.toString()).toList();
               texts = SUPPORTED_LOCALES.map((locale) => locale.name).toList();
               title = localize(context, 'language');
-              current = Localizations.localeOf(context).languageCode;
+              current = getLocaleString(Localizations.localeOf(context));
               action = (value) => settingsManager.localeString = value;
               break;
             case SettingsOptionsType.appAccent:
