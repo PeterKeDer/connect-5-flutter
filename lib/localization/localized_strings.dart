@@ -2,9 +2,7 @@ const LOCALIZED_STRINGS = {
   'en': ENGLISH,
   'zh': CHINESE_SIMPLIFIED,
   'zh_Hans': CHINESE_SIMPLIFIED,
-  'zh_Hant': {
-
-  },
+  'zh_Hant': CHINESE_TRADITIONAL,
 };
 
 const ENGLISH = {
@@ -156,5 +154,82 @@ const CHINESE_SIMPLIFIED = {
   'board_theme_blue': '蓝色',
   'board_theme_red': '红色',
   'board_theme_green': '绿色',
+  'board_theme_grey': '灰色',
+};
+
+
+const CHINESE_TRADITIONAL = {
+  'connect_5': '五子棋',
+  'cancel': '取消',
+  'confirm': '確認',
+  'done': '完成',
+
+  // Start menu
+  'continue_game': '繼續遊戲',
+  'new_game': '新遊戲',
+  'replays': '遊戲回放',
+
+  // Settings
+  'settings': '設置',
+  'general': '通用',
+  'change_language': '切換語言',
+  'language': '語言',
+  'game': '遊戲',
+  'double_tap_to_confirm': '雙擊確認落子',
+  'highlight_last_step': '標記上一步',
+  'highlight_winning_moves': '標記勝利棋子',
+  'board_size': '棋盤大小',
+  'appearance': '外貌',
+  'dark_mode': '黑夜模式',
+  'accent': '色調',
+  'board_theme': '棋盤色調',
+
+  // Game
+  'start_new_game': '開始新遊戲',
+  'two_players': '雙人',
+  'bot_black': '人機（黑棋）',
+  'bot_white': '人機（白棋）',
+  'restart_game': '重新開始',
+  'quit': '退出',
+  'black_victory': '黑棋勝利',
+  'white_victory': '白棋勝利',
+  'tie': '平局',
+
+  // Replays
+  'steps': '步',
+  'no_replays_message': '目前沒有任何遊戲回放。當你完成一盤遊戲時，它會被存在這裏。',
+
+  // Stats
+  'stats': '數據',
+  'total_games_played': '遊戲總數',
+  'total_black_victory': '黑棋勝利總數',
+  'total_white_victory': '白棋勝利總數',
+  'games_played': '遊戲次數',
+  'games_won': '勝利次數',
+  'games_lost': '失敗次數',
+  'win_rate': '勝率',
+  'player_vs_bot_black': '玩家 vs 人機（黑棋）',
+  'player_vs_bot_white': '玩家 vs 人機（白棋）',
+  'clear_stats': '清空數據',
+  'clear_stats_alert_message': '確定要清空數據嗎？它們會被永久刪除。',
+
+  // Help
+  'help': '幫助',
+  'help_message': '兩個玩家輪流放在棋盤上放下一個棋子。第一個將五個棋子連成一條直線的玩家獲勝。',
+
+  // Accents
+  'accent_blue': '藍色',
+  'accent_red': '紅色',
+  'accent_green': '綠色',
+  'accent_orange': '橙色',
+  'accent_grey': '灰色',
+
+  // Board themes
+  'board_theme_classic': '經典',
+  'board_theme_classic_darker': '深色經典',
+  'board_theme_night': '黑夜',
+  'board_theme_blue': '藍色',
+  'board_theme_red': '紅色',
+  'board_theme_green': '綠色',
   'board_theme_grey': '灰色',
 };
