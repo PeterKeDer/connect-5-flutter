@@ -1,4 +1,3 @@
-import 'package:connect_5/app_localizations.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/helpers/stats_manager.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
@@ -49,10 +48,7 @@ class Connect5App extends StatelessWidget {
             final settingsManager = Provider.of<SettingsManager>(context);
             final savedLocale = settingsManager.locale;
 
-            if (
-              savedLocale == null
-              && SUPPORTED_LOCALES.firstWhere((locale) => locale.languageCode == deviceLocale.languageCode) != null
-            ) {
+            if (savedLocale == null && isLocaleSupported(deviceLocale.languageCode)) {
               settingsManager.localeString = deviceLocale.languageCode;
             }
 
@@ -64,7 +60,7 @@ class Connect5App extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
             const AppLocalizationsDelegate(),
           ],
-          supportedLocales: SUPPORTED_LOCALES,
+          supportedLocales: SUPPORTED_LOCALES.map((locale) => locale.locale).toList(),
           theme: Provider.of<SettingsManager>(context).appTheme,
           home: StartPage(),
         ),

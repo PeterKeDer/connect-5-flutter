@@ -1,4 +1,4 @@
-import 'package:connect_5/app_localizations.dart';
+import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game.dart';
@@ -8,20 +8,21 @@ import 'package:connect_5/pages/help_page.dart';
 import 'package:connect_5/pages/replays_page.dart';
 import 'package:connect_5/pages/settings_page.dart';
 import 'package:connect_5/pages/stats_page.dart';
+import 'package:connect_5/util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class StartPage extends StatelessWidget {
-  Widget _buildButton(String title, VoidCallback onPressed) {
+  Widget _buildButton(BuildContext context, String title, HandlerFunction<BuildContext> onPressed) {
     return RaisedButton(
       child: Text(
-        title,
+        localize(context, title),
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold
         ),
       ),
-      onPressed: onPressed,
+      onPressed: onPressed == null ? null : () => onPressed(context),
     );
   }
 
@@ -117,12 +118,12 @@ class StartPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      _buildButton(localize(context, 'continue_game'), storageManger.games?.lastGame == null
+                      _buildButton(context, 'continue_game', storageManger.games?.lastGame == null
                         ? null
-                        : () => _handleContinueGameButtonPressed(context)
+                        : _handleContinueGameButtonPressed
                       ),
-                      _buildButton(localize(context, 'new_game'), () => _handleNewGameButtonPressed(context)),
-                      _buildButton(localize(context, 'replays'), () => _handleReplaysButtonPressed(context)),
+                      _buildButton(context, 'new_game', _handleNewGameButtonPressed),
+                      _buildButton(context, 'replays', _handleReplaysButtonPressed),
                     ],
                   ),
                 ),

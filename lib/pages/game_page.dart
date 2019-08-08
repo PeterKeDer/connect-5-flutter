@@ -1,4 +1,4 @@
-import 'package:connect_5/app_localizations.dart';
+import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/components/status_bar.dart';
 import 'package:connect_5/controllers/local_bot.dart';

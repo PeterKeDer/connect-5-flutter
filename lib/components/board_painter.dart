@@ -1,8 +1,6 @@
 import 'package:connect_5/components/board_spot_painter.dart';
 import 'package:flutter/material.dart';
 
-typedef void HandlerFunction<T>(T value);
-
 class BoardTheme {
   final Color boardColor;
   final Color lineColor;

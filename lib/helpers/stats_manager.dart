@@ -1,5 +1,6 @@
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
+import 'package:connect_5/util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,10 +26,8 @@ class StoredStat extends Stat {
   StoredStat(String title, this.key) : super(title);
 }
 
-typedef String ComputeFunction();
-
 class ComputedStat extends Stat {
-  final ComputeFunction compute;
+  final ReturnFunction<String> compute;
 
   String get value => compute();
 

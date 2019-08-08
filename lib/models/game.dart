@@ -1,6 +1,3 @@
-import 'package:connect_5/models/game_mode.dart';
-import 'package:connect_5/models/storable_games.dart';
-
 enum GameError {
   outOfBounds,
   spotTaken,
@@ -14,6 +11,8 @@ enum BoardSpot {
 enum Side {
   black, white
 }
+
+Side toggleSide(Side side) => side == Side.black ? Side.white : Side.black;
 
 Side sideFromString(String str) => Side.values.firstWhere((s) => s.toString() == str);
 
@@ -207,6 +206,6 @@ class Game {
   bool get isFinished => winner != null || isFull;
 
   void _toggleSide() {
-    currentSide = currentSide == Side.black ? Side.white : Side.black;
+    currentSide = toggleSide(currentSide);
   }
 }

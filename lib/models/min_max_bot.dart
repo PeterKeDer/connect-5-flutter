@@ -107,7 +107,7 @@ class MinMaxBot extends GameBot {
     Side side = game.initialSide;
     for (final point in game.steps) {
       notifyMove(point, side);
-      side = side == Side.black ? Side.white : Side.black;
+      side = toggleSide(side);
     }
   }
 

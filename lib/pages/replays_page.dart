@@ -1,4 +1,4 @@
-import 'package:connect_5/app_localizations.dart';
+import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/components/board_painter.dart';
 import 'package:connect_5/components/board_spot_painter.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ReplaysPage extends StatelessWidget {
-  static const double BOARD_SIZE = 80;
   static const double SPACING = 15;
 
   static const TITLE_TEXT_STYLE = TextStyle(fontWeight: FontWeight.bold, fontSize: 18);
@@ -26,7 +25,7 @@ class ReplaysPage extends StatelessWidget {
     Side side = replay.initialSide;
     for (final point in replay.steps) {
       spotPainters[point.x][point.y].addPiece(side);
-      side = side == Side.black ? Side.white : Side.black;
+      side = toggleSide(side);
     }
 
     return spotPainters;
@@ -36,46 +35,39 @@ class ReplaysPage extends StatelessWidget {
     Container(
       child: InkWell(
         onTap: () => _showReplay(context, replay),
-        child: Row(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(SPACING),
-              child: Container(
-                width: BOARD_SIZE,
-                height: BOARD_SIZE,
-                child: CustomPaint(
-                  painter: BoardPainter(
-                    boardSize: replay.boardSize,
-                    spotPainters: spotPainters,
-                    cornerRadius: 3,
-                    drawLines: false,
-                    boardTheme: Provider.of<SettingsManager>(context).boardTheme,
+        child: Padding(
+          padding: const EdgeInsets.all(SPACING),
+          child: IntrinsicHeight(
+            child: Row(
+              children: <Widget>[
+                AspectRatio(
+                  aspectRatio: 1,
+                  child: CustomPaint(
+                    painter: BoardPainter(
+                      boardSize: replay.boardSize,
+                      spotPainters: spotPainters,
+                      cornerRadius: 3,
+                      drawLines: false,
+                      boardTheme: Provider.of<SettingsManager>(context).boardTheme,
+                    ),
                   ),
                 ),
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  localize(context, getString(replay.gameMode)),
-                  style: TITLE_TEXT_STYLE,
-                ),
-                Text(
-                  '${replay.boardSize} x ${replay.boardSize}',
-                  style: DEFAULT_TEXT_STYLE,
-                ),
-                Text(
-                  '${localize(context, _getWinnerText(replay.winner))} - ${replay.steps.length} ${localize(context, 'steps')}',
-                  style: DEFAULT_TEXT_STYLE,
-                ),
-                Text(
-                  replay.date ?? '',
-                  style: DEFAULT_TEXT_STYLE,
+                Padding(padding: const EdgeInsets.only(right: SPACING)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      localize(context, getString(replay.gameMode)),
+                      style: Theme.of(context).textTheme.title,
+                    ),
+                    Text('${replay.boardSize} x ${replay.boardSize}'),
+                    Text('${localize(context, _getWinnerText(replay.winner))} - ${replay.steps.length} ${localize(context, 'steps')}'),
+                    Text(replay.date ?? ''),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

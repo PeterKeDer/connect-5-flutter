@@ -1,4 +1,4 @@
-import 'package:connect_5/app_localizations.dart';
+import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/helpers/stats_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +31,7 @@ class StatsPage extends StatelessWidget {
               child: Text(localize(context, 'clear_stats')),
               onPressed: () => showDialog(
                 context: context,
-                child: AlertDialog(
+                builder: (context) => AlertDialog(
                   title: Text(localize(context, 'clear_stats')),
                   content: Text(localize(context, 'clear_stats_alert_message')),
                   actions: <Widget>[

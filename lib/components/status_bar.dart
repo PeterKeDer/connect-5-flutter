@@ -1,6 +1,6 @@
-import 'package:connect_5/app_localizations.dart';
 import 'package:connect_5/controllers/game_controller.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
+import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,4 @@
-import 'package:connect_5/app_localizations.dart';
+import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/components/board_painter.dart';
 import 'package:connect_5/components/board_spot_painter.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
@@ -43,7 +43,6 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   ];
 
   List<List<BoardSpotPainter>> _spotPainters;
-  Game _game;
 
   @override
   void initState() {
@@ -66,7 +65,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
       final painter = _spotPainters[point.x][point.y];
 
       painter.addPiece(side);
-      side = side == Side.black ? Side.white : Side.black;
+      side = toggleSide(side);
 
       if (point == INITIAL_STEPS.last) {
         painter.addHighlight();
@@ -88,7 +87,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
       painter.addHighlightAnimated();
       painter.removeTargetAnimated();
 
-      side = side == Side.black ? Side.white : Side.black;
+      side = toggleSide(side);
 
       prevPainter?.removeHighlightAnimated();
       prevPainter = painter;

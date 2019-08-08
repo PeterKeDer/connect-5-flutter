@@ -1,7 +1,6 @@
-import 'package:connect_5/app_localizations.dart';
-import 'package:connect_5/components/board_painter.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/localization/localization.dart';
+import 'package:connect_5/util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,8 +24,8 @@ class SettingsPage extends StatelessWidget {
 
           switch (type) {
             case SettingsOptionsType.locale:
-              keys = SUPPORTED_LOCALES.map((locale) => locale.languageCode).toList();
-              texts = LOCALE_NAMES;
+              keys = SUPPORTED_LOCALES.map((locale) => locale.locale.languageCode).toList();
+              texts = SUPPORTED_LOCALES.map((locale) => locale.name).toList();
               title = localize(context, 'language');
               current = Localizations.localeOf(context).languageCode;
               action = (value) => settingsManager.localeString = value;
