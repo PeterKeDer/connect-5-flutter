@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-
 void main() async {
   final settingsManager = SettingsManager();
   final gameStorageManager = GameStorageManager();
@@ -41,38 +40,41 @@ class Connect5App extends StatelessWidget {
         ChangeNotifierProvider<StatsManager>.value(value: statsManager),
       ],
       child: Builder(
-        builder: (context) => MaterialApp(
-          title: 'Connect 5',
-          locale: Provider.of<SettingsManager>(context).locale,
-          localeResolutionCallback: (deviceLocale, supportedLocales) {
-            final settingsManager = Provider.of<SettingsManager>(context);
-            final savedLocale = settingsManager.locale;
+        builder: (context) {
+          final settingsManager = Provider.of<SettingsManager>(context);
 
-            if (savedLocale == null) {
-              Future.delayed(Duration.zero, () {
-                // Choose best supported locale to match
-                if (isLocaleSupported(deviceLocale)) {
-                  settingsManager.localeString = getLocaleString(deviceLocale);
-                } else if (isLanguageCodeSupported(deviceLocale.languageCode)) {
-                  settingsManager.localeString = deviceLocale.languageCode;
-                } else {
-                  settingsManager.localeString = 'en';
-                }
-              });
-            }
+          return MaterialApp(
+            title: 'Connect 5',
+            locale: settingsManager.locale,
+            localeResolutionCallback: (deviceLocale, supportedLocales) {
+              final savedLocale = settingsManager.locale;
 
-            return savedLocale ?? deviceLocale;
-          },
-          localizationsDelegates: [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            const AppLocalizationsDelegate(),
-          ],
-          supportedLocales: SUPPORTED_LOCALES.map((locale) => locale.locale).toList(),
-          theme: Provider.of<SettingsManager>(context).appTheme,
-          home: StartPage(),
-        ),
+              if (savedLocale == null) {
+                Future.delayed(Duration.zero, () {
+                  // Choose best supported locale to match
+                  if (isLocaleSupported(deviceLocale)) {
+                    settingsManager.localeString = getLocaleString(deviceLocale);
+                  } else if (isLanguageCodeSupported(deviceLocale.languageCode)) {
+                    settingsManager.localeString = deviceLocale.languageCode;
+                  } else {
+                    settingsManager.localeString = 'en';
+                  }
+                });
+              }
+
+              return savedLocale ?? deviceLocale;
+            },
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              const AppLocalizationsDelegate(),
+            ],
+            supportedLocales: SUPPORTED_LOCALES.map((locale) => locale.locale).toList(),
+            theme: settingsManager.appTheme,
+            home: StartPage(),
+          );
+        },
       )
     );
   }

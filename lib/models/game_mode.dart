@@ -40,7 +40,7 @@ Widget getIcon(GameMode gameMode, {double size = 25, Color color = Colors.black4
   return null;
 }
 
-String getString(GameMode gameMode) {
+String getDisplayString(GameMode gameMode) {
   switch (gameMode) {
     case GameMode.twoPlayers:
       return 'two_players';

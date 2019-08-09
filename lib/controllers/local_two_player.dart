@@ -60,18 +60,6 @@ class LocalTwoPlayerGameController extends GameController with BoardSpotPainters
   }
 
   @override
-  void undo() {
-    try {
-      game.undoStep();
-      gameEventListener();
-      notifyListeners();
-
-    } on GameError catch (error) {
-
-    }
-  }
-
-  @override
   void moveBoard() {
     selectedPoint = null;
   }

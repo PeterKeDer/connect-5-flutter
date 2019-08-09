@@ -157,7 +157,6 @@ const CHINESE_SIMPLIFIED = {
   'board_theme_grey': '灰色',
 };
 
-
 const CHINESE_TRADITIONAL = {
   'connect_5': '五子棋',
   'cancel': '取消',

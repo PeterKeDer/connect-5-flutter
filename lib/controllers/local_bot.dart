@@ -49,11 +49,6 @@ class LocalBotGameController extends GameController with BoardSpotPaintersMixin 
   }
 
   @override
-  void undo() {
-    // TODO: implement this with bot
-  }
-
-  @override
   void moveBoard() {
     selectedPoint = null;
   }

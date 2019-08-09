@@ -1,38 +1,8 @@
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
-import 'package:connect_5/util.dart';
+import 'package:connect_5/models/stats.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-class StatGroup {
-  String title;
-  List<Stat> stats;
-  StatGroup(this.title, this.stats);
-}
-
-abstract class Stat {
-  final String title;
-  String get value;
-
-  Stat(this.title);
-}
-
-class StoredStat extends Stat {
-  final String key;
-  int storedValue = 0;
-
-  String get value => '$storedValue';
-
-  StoredStat(String title, this.key) : super(title);
-}
-
-class ComputedStat extends Stat {
-  final ReturnFunction<String> compute;
-
-  String get value => compute();
-
-  ComputedStat(String title, this.compute) : super(title);
-}
 
 class StatsManager extends ChangeNotifier {
   List<StatGroup> statGroups;

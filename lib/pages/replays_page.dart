@@ -57,7 +57,7 @@ class ReplaysPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      localize(context, getString(replay.gameMode)),
+                      localize(context, getDisplayString(replay.gameMode)),
                       style: Theme.of(context).textTheme.title,
                     ),
                     Text('${replay.boardSize} x ${replay.boardSize}'),

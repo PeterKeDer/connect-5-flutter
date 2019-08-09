@@ -1,64 +1,63 @@
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/localization/localization.dart';
-import 'package:connect_5/util.dart';
+import 'package:connect_5/pages/settings_options_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-enum SettingsOptionsType {
-  locale, appAccent, boardTheme
-}
-
 class SettingsPage extends StatelessWidget {
-  void _showOptionsPage(BuildContext context, SettingsOptionsType type) {
+  void _showLanguageOptions(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) {
           final settingsManager = Provider.of<SettingsManager>(context);
 
-          List<String> keys;
-          List<String> texts;
-          String title;
-          String current;
-          HandlerFunction<String> action;
+          return SettingsOptionsPage(
+            title: localize(context, 'language'),
+            texts: SUPPORTED_LOCALES.map((locale) => locale.name).toList(),
+            values: SUPPORTED_LOCALES.map((locale) => locale.locale.toString()).toList(),
+            current: settingsManager.localeString ?? getLocaleString(Localizations.localeOf(context)),
+            action: (value) => settingsManager.localeString = value,
+          );
+        }
+      )
+    );
+  }
 
-          switch (type) {
-            case SettingsOptionsType.locale:
-              keys = SUPPORTED_LOCALES.map((locale) => locale.locale.toString()).toList();
-              texts = SUPPORTED_LOCALES.map((locale) => locale.name).toList();
-              title = localize(context, 'language');
-              current = getLocaleString(Localizations.localeOf(context));
-              action = (value) => settingsManager.localeString = value;
-              break;
-            case SettingsOptionsType.appAccent:
-              keys = SettingsManager.APP_ACCENT.keys.toList();
-              texts = keys.map((accent) => localize(context, accent)).toList();
-              title = localize(context, 'accent');
-              current = settingsManager.appAccentString;
-              action = (value) => settingsManager.appAccentString = value;
-              break;
-            case SettingsOptionsType.boardTheme:
-              keys = SettingsManager.BOARD_THEME.keys.toList();
-              texts = keys.map((theme) => localize(context, theme)).toList();
-              title = localize(context, 'board_theme');
-              current = settingsManager.boardThemeString;
-              action = (value) => settingsManager.boardThemeString = value;
-              break;
-          }
+  void _showAccentOptions(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          final settingsManager = Provider.of<SettingsManager>(context);
+          final accents = SettingsManager.APP_ACCENT.keys;
 
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(title),
-            ),
-            body: ListView(
-              children: List.generate(keys.length, (i) =>
-                ListTile(
-                  title: Text(texts[i]),
-                  trailing: keys[i] == current ? Icon(Icons.check) : null,
-                  onTap: () => action(keys[i]),
-                )
-              )
-            ),
+          return SettingsOptionsPage(
+            title: localize(context, 'accent'),
+            texts: accents.map((accent) => localize(context, accent)).toList(),
+            values: accents.toList(),
+            current: settingsManager.appAccentString,
+            action: (value) => settingsManager.appAccentString = value,
+          );
+        }
+      )
+    );
+  }
+
+  void _showBoardThemeOptions(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          final settingsManager = Provider.of<SettingsManager>(context);
+          final themes = SettingsManager.BOARD_THEME.keys;
+
+          return SettingsOptionsPage(
+            title: localize(context, 'board_theme'),
+            texts: themes.map((theme) => localize(context, theme)).toList(),
+            current: settingsManager.boardThemeString,
+            values: themes.toList(),
+            action: (value) => settingsManager.boardThemeString = value,
           );
         }
       )
@@ -81,7 +80,7 @@ class SettingsPage extends StatelessWidget {
           ),
           ListTile(
             title: Text(localize(context, 'change_language')),
-            onTap: () => _showOptionsPage(context, SettingsOptionsType.locale),
+            onTap: () => _showLanguageOptions(context),
           ),
           ListTile(
             subtitle: Text(localize(context, 'game')),
@@ -127,12 +126,12 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             title: Text(localize(context, 'accent')),
             trailing: Text(localize(context, settingsManager.appAccentString)),
-            onTap: () => _showOptionsPage(context, SettingsOptionsType.appAccent),
+            onTap: () => _showAccentOptions(context),
           ),
           ListTile(
             title: Text(localize(context, 'board_theme')),
             trailing: Text(localize(context, settingsManager.boardThemeString)),
-            onTap: () => _showOptionsPage(context, SettingsOptionsType.boardTheme),
+            onTap: () => _showBoardThemeOptions(context),
           )
         ],
       )

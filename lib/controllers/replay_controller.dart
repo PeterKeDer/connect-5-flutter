@@ -47,11 +47,6 @@ class ReplayGameController extends GameController with BoardSpotPaintersMixin {
   }
 
   @override
-  void undo() {
-
-  }
-
-  @override
   void moveBoard() {
 
   }

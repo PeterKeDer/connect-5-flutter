@@ -17,10 +17,10 @@ class GameStatusBar extends StatefulWidget {
 }
 
 class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProviderStateMixin {
-  // TODO: move into global ui constants file
-  static const double DEFAULT_SPACING = 20;
+  static const double SPACING = 20;
   static const double BAR_HEIGHT = 80;
   static const double BORDER_RADIUS = 10;
+  static const BACKGROUND_ALPHA = 180;
   static const ANIMATION_DURATION = Duration(milliseconds: 150);
 
   AnimationController _pieceColorAnimationController;
@@ -51,10 +51,10 @@ class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProvider
   }
 
   Widget _buildPieceIndicator(Side side) {
-    final size = BAR_HEIGHT - DEFAULT_SPACING;
+    final size = BAR_HEIGHT - SPACING;
 
     return Container(
-      padding: EdgeInsets.only(right: DEFAULT_SPACING),
+      padding: EdgeInsets.only(right: SPACING),
       height: size,
       width: size,
       decoration: BoxDecoration(
@@ -71,7 +71,7 @@ class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProvider
     } else if (gameController.game.isFull) {
       statusBarText = localize(context, 'tie');
     } else {
-      statusBarText = localize(context, getString(gameController.gameMode));
+      statusBarText = localize(context, getDisplayString(gameController.gameMode));
     }
     
     return Text(
@@ -105,11 +105,11 @@ class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProvider
     return Container(
       height: BAR_HEIGHT,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withAlpha(180),
+        color: Theme.of(context).colorScheme.primary.withAlpha(BACKGROUND_ALPHA),
         borderRadius: BorderRadius.circular(BORDER_RADIUS),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: DEFAULT_SPACING, vertical: DEFAULT_SPACING / 2),
+        padding: const EdgeInsets.symmetric(horizontal: SPACING, vertical: SPACING / 2),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[

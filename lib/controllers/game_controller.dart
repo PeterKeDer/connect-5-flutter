@@ -13,7 +13,6 @@ abstract class GameController extends ChangeNotifier {
 
   // Handle events
   void tap(Point point);
-  void undo();
   void moveBoard();
 
   VoidCallback gameEventListener;

@@ -36,7 +36,7 @@ class StartPage extends StatelessWidget {
       title: localize(context, 'start_new_game'),
       items: LOCAL_GAME_MODES.map((gameMode) => PopupActionSheetItem(
         leading: getIcon(gameMode, color: Theme.of(context).textTheme.caption.color),
-        text: localize(context, getString(gameMode)),
+        text: localize(context, getDisplayString(gameMode)),
         onTap: () => _startGame(context, gameMode)
       )).toList()
     ).show(context);
