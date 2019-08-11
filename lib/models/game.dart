@@ -1,7 +1,6 @@
 enum GameError {
   outOfBounds,
   spotTaken,
-  noStepsToUndo
 }
 
 enum BoardSpot {
@@ -114,22 +113,6 @@ class Game {
     _toggleSide();
   }
 
-  /// Return whether there are any steps to undo
-  bool get canUndo {
-    return steps.isNotEmpty;
-  }
-
-  /// Undo the last step, or throw noStepsToUndo error if there are no steps
-  void undoStep() {
-    if (!canUndo) {
-      throw GameError.noStepsToUndo;
-    }
-    board.setSpot(steps.removeLast(), BoardSpot.empty);
-
-    _shouldRecalculateWinner = true;
-    _toggleSide();
-  }
-
   bool get isFull {
     return board.isFull;
   }
@@ -170,7 +153,7 @@ class Game {
         lines.add(List.generate(board.size - i, (j) => Point(i + j, board.size - j - 1)));
       }
     }
-    
+
     // Get the first consecutive side
     return lines.map(_getWinDetails).firstWhere((win) => win != null, orElse: () => null);
   }

@@ -1,3 +1,4 @@
+import 'package:connect_5/helpers/multiplayer_manager.dart';
 import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
@@ -5,6 +6,7 @@ import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/pages/game_page.dart';
 import 'package:connect_5/pages/help_page.dart';
+import 'package:connect_5/pages/multiplayer_rooms_page.dart';
 import 'package:connect_5/pages/replays_page.dart';
 import 'package:connect_5/pages/settings_page.dart';
 import 'package:connect_5/pages/stats_page.dart';
@@ -51,6 +53,42 @@ class StartPage extends StatelessWidget {
         fullscreenDialog: true, // Prevents swipe back
       )
     );
+  }
+
+  void _handleMultiplayerButtonPressed(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) => Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    final rooms = await Provider.of<MultiplayerManager>(context).getRooms();
+    Navigator.pop(context);
+
+    if (rooms != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MultiplayerRoomsPage(),
+        )
+      );
+    } else {
+      showDialog(
+        context: context,
+        child: AlertDialog(
+          title: Text(localize(context, 'connection_failed')),
+          content: Text(localize(context, 'connection_failed_message')),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(localize(context, 'ok')),
+              textColor: Theme.of(context).colorScheme.primary,
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        )
+      );
+    }
   }
 
   void _handleReplaysButtonPressed(BuildContext context) {
@@ -122,6 +160,7 @@ class StartPage extends StatelessWidget {
                         : _handleContinueGameButtonPressed
                       ),
                       _buildButton(context, 'new_game', _handleNewGameButtonPressed),
+                      _buildButton(context, 'multiplayer', _handleMultiplayerButtonPressed),
                       _buildButton(context, 'replays', _handleReplaysButtonPressed),
                     ],
                   ),

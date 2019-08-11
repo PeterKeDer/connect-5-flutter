@@ -63,7 +63,7 @@ class LocalBotGameController extends GameController with BoardSpotPaintersMixin 
       game.addStep(point);
       addPiece(point, prevSide);
       bot.notifyMove(point, prevSide);
-      
+
       removeHighlights();
 
       final winner = game.winner;
@@ -75,7 +75,7 @@ class LocalBotGameController extends GameController with BoardSpotPaintersMixin 
 
       gameEventListener();
       notifyListeners();
-      
+
       if (game.currentSide == botSide && !game.isFinished) {
         _startBotMove();
       }
@@ -83,8 +83,6 @@ class LocalBotGameController extends GameController with BoardSpotPaintersMixin 
     } on GameError catch (error) {
       switch (error) {
         case GameError.spotTaken:
-          break;
-        case GameError.noStepsToUndo:
           break;
         case GameError.outOfBounds:
           break;

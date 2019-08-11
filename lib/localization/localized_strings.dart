@@ -10,6 +10,7 @@ const ENGLISH = {
   'cancel': 'Cancel',
   'confirm': 'Confirm',
   'done': 'Done',
+  'ok': 'OK',
 
   // Start menu
   'continue_game': 'Continue Game',
@@ -79,6 +80,13 @@ const ENGLISH = {
   'board_theme_red': 'Red',
   'board_theme_green': 'Green',
   'board_theme_grey': 'Grey',
+
+  // Multiplayer
+  'multiplayer': 'Multiplayer',
+  'connection_failed': 'Connection Failed',
+  'connection_failed_message': 'Cannot connect to server. Please check your internet connection and try again later.',
+  'rooms': 'Rooms',
+  'no_rooms_message': 'No rooms at the moment. You can create one!',
 };
 
 const CHINESE_SIMPLIFIED = {
@@ -86,6 +94,7 @@ const CHINESE_SIMPLIFIED = {
   'cancel': '取消',
   'confirm': '确认',
   'done': '完成',
+  'ok': 'OK',
 
   // Start menu
   'continue_game': '继续游戏',
@@ -162,6 +171,7 @@ const CHINESE_TRADITIONAL = {
   'cancel': '取消',
   'confirm': '確認',
   'done': '完成',
+  'ok': 'OK',
 
   // Start menu
   'continue_game': '繼續遊戲',

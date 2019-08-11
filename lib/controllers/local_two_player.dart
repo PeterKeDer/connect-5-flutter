@@ -34,9 +34,9 @@ class LocalTwoPlayerGameController extends GameController with BoardSpotPainters
       final prevSide = game.currentSide;
       game.addStep(point);
       addPiece(point, prevSide);
-      
+
       removeHighlights();
-      
+
       final winner = game.winner;
       if (winner != null && settings.shouldHighlightWinningMoves) {
         highlightWinningMoves(winner.points);
@@ -50,8 +50,6 @@ class LocalTwoPlayerGameController extends GameController with BoardSpotPainters
     } on GameError catch (error) {
       switch (error) {
         case GameError.spotTaken:
-          break;
-        case GameError.noStepsToUndo:
           break;
         case GameError.outOfBounds:
           break;

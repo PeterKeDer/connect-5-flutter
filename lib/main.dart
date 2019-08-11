@@ -1,3 +1,4 @@
+import 'package:connect_5/helpers/multiplayer_manager.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/helpers/stats_manager.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
@@ -26,6 +27,7 @@ class Connect5App extends StatelessWidget {
   final SettingsManager settingsManager;
   final GameStorageManager gameStorageManger;
   final StatsManager statsManager;
+  final MultiplayerManager multiplayerManager = MultiplayerManager();
 
   Connect5App(this.settingsManager, this.gameStorageManger, this.statsManager);
 
@@ -38,6 +40,7 @@ class Connect5App extends StatelessWidget {
         ChangeNotifierProvider<GameStorageManager>.value(value: gameStorageManger),
         ChangeNotifierProvider<SettingsManager>.value(value: settingsManager),
         ChangeNotifierProvider<StatsManager>.value(value: statsManager),
+        ChangeNotifierProvider<MultiplayerManager>.value(value: multiplayerManager),
       ],
       child: Builder(
         builder: (context) {
