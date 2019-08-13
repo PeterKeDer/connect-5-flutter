@@ -6,7 +6,7 @@ import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/pages/game_page.dart';
 import 'package:connect_5/pages/help_page.dart';
-import 'package:connect_5/pages/multiplayer_rooms_page.dart';
+import 'package:connect_5/pages/multiplayer/rooms_page.dart';
 import 'package:connect_5/pages/replays_page.dart';
 import 'package:connect_5/pages/settings_page.dart';
 import 'package:connect_5/pages/stats_page.dart';
@@ -76,7 +76,7 @@ class StartPage extends StatelessWidget {
     } else {
       showDialog(
         context: context,
-        child: AlertDialog(
+        builder: (context) => AlertDialog(
           title: Text(localize(context, 'connection_failed')),
           content: Text(localize(context, 'connection_failed_message')),
           actions: <Widget>[

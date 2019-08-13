@@ -2,8 +2,9 @@ import 'package:connect_5/models/game.dart';
 import 'package:connect_5/util.dart';
 
 Side getSide(int side) => side == 1 ? Side.black : Side.white;
-List<Point> parsePoints(json) => guardTypeNotNull<List<Map<String, dynamic>>>(json)
-  .map((pointJson) => Point(guardTypeNotNull(pointJson['x']), guardTypeNotNull(pointJson['y'])));
+List<Point> parsePoints(json) {
+  return List.from(json.map((pointJson) => Point(guardTypeNotNull(pointJson['x']), guardTypeNotNull(pointJson['y']))));
+}
 
 class MultiplayerGame implements Game {
   Board board;
