@@ -1,3 +1,4 @@
+import 'package:connect_5/components/loading_dialog.dart';
 import 'package:connect_5/helpers/multiplayer_manager.dart';
 import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/components/popup_action_sheet.dart';
@@ -56,12 +57,7 @@ class StartPage extends StatelessWidget {
   }
 
   void _handleMultiplayerButtonPressed(BuildContext context) async {
-    showDialog(
-      context: context,
-      builder: (context) => Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+    showLoadingDialog(context);
 
     final rooms = await Provider.of<MultiplayerManager>(context).getRooms();
     Navigator.pop(context);

@@ -30,7 +30,7 @@ class GameRoom {
 
   GameRoom.fromJson(Map<String, dynamic> json) : id = guardTypeNotNull(json['id']) {
     Map<String, dynamic> settingsJson = guardType(json['settings']);
-    if (settings != null) {
+    if (settingsJson != null) {
       settings = GameRoomSettings.fromJson(settingsJson);
     } else {
       settings = GameRoomSettings();
@@ -46,8 +46,11 @@ class GameRoom {
       player2 = User.fromJson(player2Json);
     }
 
-    List<Map<String, dynamic>> spectatorJsons = guardType(json['spectators']) ?? [];
-    spectators = List.from(spectatorJsons.map((userJson) => User.fromJson(userJson)));
+    try {
+      spectators = List.from(json['spectators'].map((userJson) => User.fromJson(userJson)));
+    } catch (error) {
+      spectators = [];
+    }
 
     Map<String, dynamic> gameJson = guardType(json['game']);
     if (gameJson != null) {

@@ -28,6 +28,10 @@ abstract class MultiplayerGameEventHandler {
   void handleAddStepFailed(Game game);
 }
 
+enum CreateRoomError {
+  unknown, invalidRoomId, roomIdTaken,
+}
+
 class MultiplayerManager extends ChangeNotifier {
   IO.Socket _socket;
 
@@ -38,6 +42,8 @@ class MultiplayerManager extends ChangeNotifier {
 
   List<GameRoom> rooms;
   GameRoom currentRoom;
+
+  String get userId => _socket?.id;
 
   Side get currentSide {
     if (_socket.id == currentRoom.player1?.id) {
@@ -169,6 +175,46 @@ class MultiplayerManager extends ChangeNotifier {
     } catch (error) {
       print('Error while getting rooms: $error');
       return null;
+    }
+  }
+
+  Future<GameRoom> createRoom(String roomId, int boardSize, bool allowSpectators, bool isPublic) async {
+    try {
+      final response = await http.post(
+        '${secrets.SERVER_URI}/create-room',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'id': roomId,
+          'settings': {
+            'boardSize': boardSize,
+            'allowSpectators': allowSpectators,
+            'isPublic': isPublic,
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final roomJson = json.decode(response.body)['room'];
+        return GameRoom.fromJson(roomJson);
+
+      } else {
+        final error = json.decode(response.body)['error'] as String;
+
+        switch (error) {
+          case 'room_id_taken':
+            throw CreateRoomError.roomIdTaken;
+          case 'invalid_room_id':
+            throw CreateRoomError.invalidRoomId;
+        }
+
+        throw CreateRoomError.unknown;
+      }
+    } on CreateRoomError catch (error) {
+      throw error;
+    } catch (error) {
+      throw CreateRoomError.unknown;
     }
   }
 }

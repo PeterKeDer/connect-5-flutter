@@ -83,10 +83,32 @@ const ENGLISH = {
 
   // Multiplayer
   'multiplayer': 'Multiplayer',
+  'player_1': 'Player 1',
+  'player_2': 'Player 2',
+  'spectator': 'Spectator',
+  'spectators': 'Spectators',
+  'guest': 'Guest',
+  'you': 'You',
+  'rooms': 'Rooms',
+  'room_info': 'Room Info',
+  'room_id': 'Room ID',
+  'room_settings': 'Room Settings',
+  'allow_spectators': 'Allow Spectators',
+  'public_room': 'Public Room',
+  'no_rooms_message': 'No rooms at the moment. You can create one!',
+  'join_room': 'Join Room',
+  'join_room_by_id': 'Join Room by ID',
+  'create_room': 'Create Room',
+
+  // Multiplayer errors
   'connection_failed': 'Connection Failed',
   'connection_failed_message': 'Cannot connect to server. Please check your internet connection and try again later.',
-  'rooms': 'Rooms',
-  'no_rooms_message': 'No rooms at the moment. You can create one!',
+  'invalid_room_id': 'Invalid Room ID',
+  'invalid_room_id_message': 'The room ID is invalid. Please try another one.',
+  'room_id_taken': 'Room ID Taken',
+  'room_id_taken_message': 'The room ID is already being used by a room. Please try another one.',
+  'cannot_create_room': 'Cannot Create Room',
+  'cannot_create_room_message': 'Unable to create a room. Please check your internet connection and try again later.',
 };
 
 const CHINESE_SIMPLIFIED = {

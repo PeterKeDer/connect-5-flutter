@@ -70,7 +70,7 @@ class SettingsManager extends ChangeNotifier implements Settings {
       highlightColor: Color.fromRGBO(120, 120, 120, 1),
     ),
   };
-  
+
   SharedPreferences preferences;
 
   Future<void> initAsync() {
@@ -149,6 +149,7 @@ class SettingsManager extends ChangeNotifier implements Settings {
   ThemeData get appTheme => ThemeData(
     brightness: _isDarkMode ? Brightness.dark : Brightness.light,
     primarySwatch: APP_ACCENT[_appAccentString],
+    accentColor: APP_ACCENT[_appAccentString],
   );
 
   bool _isDarkMode;

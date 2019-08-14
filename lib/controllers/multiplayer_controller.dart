@@ -95,8 +95,6 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
 
       highlightLastStep(game.steps.last);
 
-      notifyListeners();
-
     } else {
       // Last step was by user - no action needed
       lastStep = null;
@@ -105,6 +103,8 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
     if (game.winner != null) {
       highlightWinningMoves(game.winner.points);
     }
+
+    notifyListeners();
   }
 
   void handleAddStepFailed(Game game) {

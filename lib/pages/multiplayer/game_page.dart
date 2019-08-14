@@ -9,6 +9,7 @@ import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/models/multiplayer/multiplayer_game.dart';
 import 'package:connect_5/models/storable_games.dart';
+import 'package:connect_5/pages/multiplayer/room_info_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -47,6 +48,18 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
   void _handleMenuButtonTapped() {
     PopupActionSheet(
       items: [
+        PopupActionSheetItem(
+          leading: const Icon(Icons.info_outline),
+          text: localize(context, 'room_info'),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MultiplayerRoomInfoPage(),
+              )
+            );
+          }
+        ),
         PopupActionSheetItem(
           leading: const Icon(Icons.close),
           text: localize(context, 'quit'),
