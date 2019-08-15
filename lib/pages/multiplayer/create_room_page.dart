@@ -1,4 +1,4 @@
-import 'package:connect_5/components/loading_dialog.dart';
+import 'package:connect_5/components/dialogs.dart';
 import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/helpers/multiplayer_manager.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
@@ -57,7 +57,7 @@ class _MultiplayerCreateRoomPageState extends State<MultiplayerCreateRoomPage> {
 
       multiplayerManager.connect(room.id, role,
         onJoinSuccess: () {
-          hideLoadingDialog(context);
+          hideDialog(context);
           Navigator.of(context)..pop()..push(
             MaterialPageRoute(
               builder: (context) => MultiplayerGamePage(),
@@ -65,14 +65,13 @@ class _MultiplayerCreateRoomPageState extends State<MultiplayerCreateRoomPage> {
             ),
           );
         },
-        onJoinFail: () {
-          hideLoadingDialog(context);
+        onJoinFail: (_) {
+          hideDialog(context);
           _showError(CreateRoomError.unknown);
         }
       );
     } on CreateRoomError catch (error) {
-      print(error);
-      hideLoadingDialog(context);
+      hideDialog(context);
       _showError(error);
     }
   }
@@ -96,18 +95,10 @@ class _MultiplayerCreateRoomPageState extends State<MultiplayerCreateRoomPage> {
         break;
     }
 
-    showDialog(
+    showAlertDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: <Widget>[
-          FlatButton(
-            child: Text(localize(context, 'ok')),
-            onPressed: () => Navigator.pop(context),
-          )
-        ],
-      ),
+      title: title,
+      message: message,
     );
   }
 

@@ -71,7 +71,7 @@ class ReplaysPage extends StatelessWidget {
         ),
       ),
     );
-  
+
   String _getWinnerText(Side winner) {
     if (winner == null) {
       return 'tie';
@@ -81,7 +81,7 @@ class ReplaysPage extends StatelessWidget {
       return 'white_victory';
     }
   }
-  
+
   void _showReplay(BuildContext context, ReplayData replay) {
     Navigator.push(
       context,
@@ -106,7 +106,7 @@ class ReplaysPage extends StatelessWidget {
           itemCount: replays.length,
           itemBuilder: (context, i) => _buildGameListTile(context, replays[i], spotPainters[i]),
           separatorBuilder: (context, i) => Divider(
-            color: Colors.black45,
+            color: Theme.of(context).textTheme.caption.color,
             indent: SPACING,
             height: 0,
             endIndent: SPACING

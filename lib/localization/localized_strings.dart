@@ -96,9 +96,12 @@ const ENGLISH = {
   'allow_spectators': 'Allow Spectators',
   'public_room': 'Public Room',
   'no_rooms_message': 'No rooms at the moment. You can create one!',
+  'join': 'Join',
   'join_room': 'Join Room',
   'join_room_by_id': 'Join Room by ID',
   'create_room': 'Create Room',
+  'not_allowed': 'Not Allowed',
+  'search': 'Search',
 
   // Multiplayer errors
   'connection_failed': 'Connection Failed',
@@ -109,6 +112,16 @@ const ENGLISH = {
   'room_id_taken_message': 'The room ID is already being used by a room. Please try another one.',
   'cannot_create_room': 'Cannot Create Room',
   'cannot_create_room_message': 'Unable to create a room. Please check your internet connection and try again later.',
+  'join_invalid_role': 'Cannot Join with Role',
+  'join_invalid_role_message': 'Cannot join room with role. It is likely that another player has already taken the spot.',
+  'join_invalid_room_id': 'Invalid Room ID',
+  'join_invalid_room_id_message': 'Cannot join room with ID. The room was probably deleted by the owner.',
+  'cannot_join_room': 'Cannot Join Room',
+  'cannot_join_room_message': 'Unable to join the room. Please check your internet connection and try again later.',
+  'room_not_found': 'Room Not Found',
+  'room_not_found_message': 'The room with given room ID is not found. Please verify that the ID entered is correct.',
+  'cannot_get_room': 'Cannot Get Room',
+  'cannot_get_room_message': 'Unable to get room with ID. Please check your internet connection and try again later.',
 };
 
 const CHINESE_SIMPLIFIED = {

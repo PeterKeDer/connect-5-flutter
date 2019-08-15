@@ -1,4 +1,4 @@
-import 'package:connect_5/components/loading_dialog.dart';
+import 'package:connect_5/components/dialogs.dart';
 import 'package:connect_5/helpers/multiplayer_manager.dart';
 import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/components/popup_action_sheet.dart';
@@ -70,19 +70,10 @@ class StartPage extends StatelessWidget {
         )
       );
     } else {
-      showDialog(
+      showAlertDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(localize(context, 'connection_failed')),
-          content: Text(localize(context, 'connection_failed_message')),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(localize(context, 'ok')),
-              textColor: Theme.of(context).colorScheme.primary,
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        )
+        title: localize(context, 'connection_failed'),
+        message: localize(context, 'connection_failed_message'),
       );
     }
   }

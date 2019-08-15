@@ -1,50 +1,17 @@
-import 'package:connect_5/components/loading_dialog.dart';
+import 'package:connect_5/components/dialogs.dart';
+import 'package:connect_5/components/game_room_tile.dart';
 import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/helpers/multiplayer_manager.dart';
 import 'package:connect_5/localization/localization.dart';
-import 'package:connect_5/models/multiplayer/game_room.dart';
 import 'package:connect_5/pages/multiplayer/create_room_page.dart';
 import 'package:connect_5/pages/multiplayer/game_page.dart';
+import 'package:connect_5/pages/multiplayer/join_room_mixin.dart';
+import 'package:connect_5/pages/multiplayer/search_room_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class MultiplayerRoomsPage extends StatelessWidget {
+class MultiplayerRoomsPage extends StatelessWidget with MultiplayerJoinRoomMixin {
   static const double SPACING = 15;
-
-  void _handleRoomTapped(BuildContext context, GameRoom room) {
-    PopupActionSheet(
-      title: localize(context, 'join_room'),
-      items: [
-        PopupActionSheetItem(
-          text: localize(context, 'player_1'),
-          onTap: () => _connectToRoom(context, room, 1),
-        ),
-        PopupActionSheetItem(
-          text: localize(context, 'player_2'),
-          onTap: () => _connectToRoom(context, room, 2),
-        ),
-        PopupActionSheetItem(
-          text: localize(context, 'spectator'),
-          onTap: () => _connectToRoom(context, room, 3),
-        ),
-      ],
-    ).show(context);
-  }
-
-  void _connectToRoom(BuildContext context, GameRoom room, int role) {
-    Provider.of<MultiplayerManager>(context).connect(
-      room.id,
-      role,
-      onJoinSuccess: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MultiplayerGamePage(),
-          fullscreenDialog: true,
-        )
-      ),
-      onJoinFail: () => print('Join fail!'),
-    );
-  }
 
   void _handleShowOptions(BuildContext context) {
     PopupActionSheet(
@@ -52,19 +19,33 @@ class MultiplayerRoomsPage extends StatelessWidget {
         PopupActionSheetItem(
           leading: Icon(Icons.add),
           text: localize(context, 'create_room'),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MultiplayerCreateRoomPage(),
-            ),
-          ),
+          onTap: () => _handleCreateRoom(context),
         ),
         PopupActionSheetItem(
           leading: Icon(Icons.search),
           text: localize(context, 'join_room_by_id'),
+          onTap: () => _handleJoinRoomById(context),
         ),
       ],
     ).show(context);
+  }
+
+  void _handleCreateRoom(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MultiplayerCreateRoomPage(),
+      ),
+    );
+  }
+
+  void _handleJoinRoomById(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MultiplayerSearchRoomPage(),
+      ),
+    );
   }
 
   void _handleRefreshButtonTapped(BuildContext context) async {
@@ -75,21 +56,22 @@ class MultiplayerRoomsPage extends StatelessWidget {
     Navigator.pop(context);
 
     if (rooms == null) {
-      showDialog(
+      showAlertDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(localize(context, 'connection_failed')),
-          content: Text(localize(context, 'connection_failed_message')),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(localize(context, 'ok')),
-              textColor: Theme.of(context).colorScheme.primary,
-              onPressed: () => Navigator.of(context)..pop()..pop(),
-            ),
-          ],
-        )
+        title: localize(context, 'connection_failed'),
+        message: localize(context, 'connection_failed_message'),
       );
     }
+  }
+
+  void _showGamePage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MultiplayerGamePage(),
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   @override
@@ -112,11 +94,17 @@ class MultiplayerRoomsPage extends StatelessWidget {
         onPressed: () => _handleShowOptions(context),
       ),
       body: rooms.isNotEmpty
-        ? ListView.builder(
+        ? ListView.separated(
           itemCount: rooms.length,
-          itemBuilder: (context, i) => ListTile(
-            title: Text(rooms[i].id),
-            onTap: () => _handleRoomTapped(context, rooms[i]),
+          itemBuilder: (context, i) => GameRoomTile(
+            room: rooms[i],
+            onTap: () => startJoiningRoom(context, rooms[i], onJoinSuccess: () => _showGamePage(context))
+          ),
+          separatorBuilder: (context, i) => Divider(
+            color: Theme.of(context).textTheme.caption.color,
+            indent: SPACING,
+            height: 0,
+            endIndent: SPACING
           ),
         )
         : Center(

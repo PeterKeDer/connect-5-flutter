@@ -26,7 +26,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     final size = MediaQuery.of(context).size;
     return math.min(size.width, size.height) * 0.8;
   }
-  
+
   GameController get _controller => Provider.of<GameController>(context);
 
   /// Previous offset from center of the board when the scale started
@@ -37,7 +37,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
 
   /// Offset of board from center
   Offset _offset = Offset.zero;
-  
+
   /// The center of the container of the board
   Offset _center;
 
@@ -45,7 +45,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
   Offset _initialBoardCenter;
 
   /// The last focal point where at least two fingers scale
-  Offset _lastScaleFocalPoint;
+  Offset _lastScaleFocalPoint = Offset.zero;
 
   /// Zoom when scale started
   double _initialZoom;
@@ -99,7 +99,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
         _lastScaleFocalPoint = scale.focalPoint;
       }
 
-      // Distance between current focal point and center 
+      // Distance between current focal point and center
       // = scale * distance between initial center and initial focal point
       _offset = scale.focalPoint - (_initialFocalPoint - _initialBoardCenter) * scale.scale - _center;
     });
@@ -157,7 +157,7 @@ class _GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     _offsetAnimation = Tween(begin: _offset, end: newOffset)
       .animate(_offsetAnimationController)
       ..addListener(_handleOffsetAnimate);
-    
+
     _offsetAnimationController.forward();
   }
 

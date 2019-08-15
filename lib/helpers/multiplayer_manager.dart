@@ -4,6 +4,7 @@ import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/multiplayer/game_room.dart';
 import 'package:connect_5/models/multiplayer/multiplayer_game.dart';
 import 'package:connect_5/secrets.dart' as secrets;
+import 'package:connect_5/util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:http/http.dart' as http;
@@ -28,8 +29,16 @@ abstract class MultiplayerGameEventHandler {
   void handleAddStepFailed(Game game);
 }
 
+enum GetRoomError {
+  unknown, invalidRoomId, roomNotFound,
+}
+
 enum CreateRoomError {
   unknown, invalidRoomId, roomIdTaken,
+}
+
+enum JoinRoomError {
+  unknown, invalidRole, invalidRoomId,
 }
 
 class MultiplayerManager extends ChangeNotifier {
@@ -38,7 +47,7 @@ class MultiplayerManager extends ChangeNotifier {
   String nickname = 'TestNickname';
 
   VoidCallback _joinSuccessHandler;
-  VoidCallback _joinFailHandler;
+  HandlerFunction<JoinRoomError> _joinFailHandler;
 
   List<GameRoom> rooms;
   GameRoom currentRoom;
@@ -58,7 +67,7 @@ class MultiplayerManager extends ChangeNotifier {
 
   MultiplayerGameEventHandler gameEventHandler;
 
-  void connect(String roomId, int role, {VoidCallback onJoinSuccess, VoidCallback onJoinFail}) async {
+  void connect(String roomId, int role, {VoidCallback onJoinSuccess, HandlerFunction<JoinRoomError> onJoinFail}) async {
     // Roles: 1 - player1, 2 - player2, 3 - spectator
     _joinSuccessHandler = onJoinSuccess;
     _joinFailHandler = onJoinFail;
@@ -88,11 +97,23 @@ class MultiplayerManager extends ChangeNotifier {
   }
 
   void _registerSocketEvents() {
-    _socket.on(Events.failToJoin, (_) {
+    _socket.on(Events.failToJoin, (data) {
       currentRoom = null;
 
       if (_joinFailHandler != null) {
-        _joinFailHandler();
+        var error = JoinRoomError.unknown;
+        if (data is Map<String, dynamic>) {
+          switch (data['error']) {
+            case 'invalid_room_id':
+              error = JoinRoomError.invalidRoomId;
+              break;
+            case 'invalid_role':
+              error = JoinRoomError.invalidRole;
+              break;
+          }
+        }
+
+        _joinFailHandler(error);
         _joinFailHandler = null;
       }
 
@@ -175,6 +196,33 @@ class MultiplayerManager extends ChangeNotifier {
     } catch (error) {
       print('Error while getting rooms: $error');
       return null;
+    }
+  }
+
+  Future<GameRoom> getRoom(String roomId) async {
+    try {
+      final response = await http.get(Uri.encodeFull('${secrets.SERVER_URI}/rooms/$roomId'));
+
+      if (response.statusCode == 200) {
+        final roomJson = json.decode(response.body)['room'];
+        return GameRoom.fromJson(roomJson);
+
+      } else {
+        final error = json.decode(response.body)['error'] as String;
+
+        switch (error) {
+          case 'invalid_room_id':
+            throw GetRoomError.invalidRoomId;
+          case 'room_not_found':
+            throw GetRoomError.roomNotFound;
+        }
+
+        throw GetRoomError.unknown;
+      }
+    } on GetRoomError catch (error) {
+      throw error;
+    } catch (error) {
+      throw GetRoomError.unknown;
     }
   }
 
