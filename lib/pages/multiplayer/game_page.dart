@@ -16,6 +16,12 @@ import 'package:provider/provider.dart';
 import 'package:connect_5/components/game_board.dart';
 import 'package:connect_5/controllers/game_controller.dart';
 
+class GameEventMessage {
+  final String text;
+
+  GameEventMessage(this.text);
+}
+
 class MultiplayerGamePage extends StatefulWidget {
   @override
   _MultiplayerGamePageState createState() => _MultiplayerGamePageState();
@@ -30,6 +36,10 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
   Game get game => gameController.game;
 
   MultiplayerManager get multiplayerManager => Provider.of(context);
+
+  final _messageListKey = GlobalKey<AnimatedListState>();
+
+  List<GameEventMessage> messages = [];
 
   @override
   void initState() {
@@ -54,6 +64,40 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
   void dispose() {
     gameController.dispose();
     super.dispose();
+  }
+
+  Widget _buildMessageBlock(Animation<double> animation, String message) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 3),
+    child: FadeTransition(
+      opacity: animation,
+      child: SizeTransition(
+        axis: Axis.vertical,
+        sizeFactor: animation,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            color: Theme.of(context).colorScheme.primary.withAlpha(GameStatusBar.BACKGROUND_ALPHA),
+          ),
+          child: Text(message),
+        ),
+      ),
+    ),
+  );
+
+  /// Displays a message that disappears after a short duration
+  void _displayMessage(GameEventMessage message) {
+    messages.insert(0, message);
+    _messageListKey.currentState.insertItem(0);
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (this.mounted) {
+        final index = messages.indexOf(message);
+        final text = messages.removeAt(index).text;
+        _messageListKey.currentState.removeItem(index, (context, animation) => _buildMessageBlock(animation, text));
+      }
+    });
   }
 
   void _handleMenuButtonTapped() {
@@ -129,6 +173,20 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
                 child: GameStatusBar(
                   handleMenuButtonTapped: _handleMenuButtonTapped,
                 )
+              ),
+              Positioned(
+                top: GameStatusBar.BAR_HEIGHT + DEFAULT_SPACING + 3,
+                left: DEFAULT_SPACING,
+                right: DEFAULT_SPACING,
+                child: AnimatedList(
+                  key: _messageListKey,
+                  initialItemCount: messages.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemBuilder: (context, index, animation) {
+                    return _buildMessageBlock(animation, messages[index].text);
+                  },
+                ),
               ),
               if (multiplayerManager.canResetGame)
                 Positioned(
