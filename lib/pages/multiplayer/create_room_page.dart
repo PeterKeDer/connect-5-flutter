@@ -3,6 +3,7 @@ import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/helpers/multiplayer_manager.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/localization/localization.dart';
+import 'package:connect_5/models/multiplayer/game_room.dart';
 import 'package:connect_5/pages/multiplayer/game_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -32,22 +33,22 @@ class _MultiplayerCreateRoomPageState extends State<MultiplayerCreateRoomPage> {
       items: [
         PopupActionSheetItem(
           text: localize(context, 'player_1'),
-          onTap: () => _createRoom(1),
+          onTap: () => _createRoom(GameRoomRole.player1),
         ),
         PopupActionSheetItem(
           text: localize(context, 'player_2'),
-          onTap: () => _createRoom(2),
+          onTap: () => _createRoom(GameRoomRole.player2),
         ),
         if (allowSpectators)
           PopupActionSheetItem(
             text: localize(context, 'spectator'),
-            onTap: () => _createRoom(3),
+            onTap: () => _createRoom(GameRoomRole.spectator),
           ),
       ],
     ).show(context);
   }
 
-  void _createRoom(int role) async {
+  void _createRoom(GameRoomRole role) async {
     showLoadingDialog(context);
 
     final multiplayerManager = Provider.of<MultiplayerManager>(context);

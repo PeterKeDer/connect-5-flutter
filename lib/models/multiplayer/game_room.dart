@@ -3,6 +3,37 @@ import 'package:connect_5/models/multiplayer/multiplayer_game.dart';
 import 'package:connect_5/models/multiplayer/user.dart';
 import 'package:connect_5/util.dart';
 
+enum GameRoomRole {
+  player1, player2, spectator,
+}
+
+GameRoomRole roleFromInt(int n) {
+  switch (n) {
+    case 1: return GameRoomRole.player1;
+    case 2: return GameRoomRole.player2;
+    case 3: return GameRoomRole.spectator;
+  }
+  return null;
+}
+
+int roleToInt(GameRoomRole role) {
+  switch (role) {
+    case GameRoomRole.player1: return 1;
+    case GameRoomRole.player2: return 2;
+    case GameRoomRole.spectator: return 3;
+  }
+  return -1;
+}
+
+String roleToString(GameRoomRole role) {
+  switch (role) {
+    case GameRoomRole.player1: return 'player_1';
+    case GameRoomRole.player2: return 'player_2';
+    case GameRoomRole.spectator: return 'spectator';
+  }
+  return '';
+}
+
 class GameRoomSettings {
   int boardSize = 15;
   bool allowSpectators = true;

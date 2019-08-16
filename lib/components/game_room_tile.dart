@@ -22,7 +22,7 @@ class GameRoomTile extends StatelessWidget {
     if (player == null) {
       return '--';
     } else {
-      return player.nickname ?? localize(context, 'guest');
+      return player.displayNickname(context);
     }
   }
 

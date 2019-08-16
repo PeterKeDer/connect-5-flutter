@@ -29,7 +29,17 @@ bool isLocaleSupported(Locale locale) {
 // See https://flutter.dev/docs/development/accessibility-and-localization/internationalization#alternative-class
 
 /// Localize a string to the app's current locale
-String localize(BuildContext context, String str) => AppLocalizations.of(context).localize(str);
+/// If [replacements] is given, then it will replace keys in the localized string with value
+String localize(BuildContext context, String str, [Map<String, String> replacements]) {
+  if (replacements == null) {
+    return AppLocalizations.of(context).localize(str);
+  }
+  var localized = localize(context, str);
+  replacements.forEach((key, value) {
+    localized = localized.replaceAll(key, value);
+  });
+  return localized;
+}
 
 String getLocaleString(Locale locale) => locale.scriptCode == null
   ? locale.languageCode

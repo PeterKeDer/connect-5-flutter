@@ -25,23 +25,23 @@ mixin MultiplayerJoinRoomMixin {
         if (room.player1 == null)
           PopupActionSheetItem(
             text: localize(context, 'player_1'),
-            onTap: () => _connectToRoom(context, room, 1, onJoinSuccess),
+            onTap: () => _connectToRoom(context, room, GameRoomRole.player1, onJoinSuccess),
           ),
         if (room.player2 == null)
           PopupActionSheetItem(
             text: localize(context, 'player_2'),
-            onTap: () => _connectToRoom(context, room, 2, onJoinSuccess),
+            onTap: () => _connectToRoom(context, room, GameRoomRole.player2, onJoinSuccess),
           ),
         if (room.settings.allowSpectators)
           PopupActionSheetItem(
             text: localize(context, 'spectator'),
-            onTap: () => _connectToRoom(context, room, 3, onJoinSuccess),
+            onTap: () => _connectToRoom(context, room, GameRoomRole.spectator, onJoinSuccess),
           ),
       ],
     ).show(context);
   }
 
-  void _connectToRoom(BuildContext context, GameRoom room, int role, VoidCallback onJoinSuccess) {
+  void _connectToRoom(BuildContext context, GameRoom room, GameRoomRole role, VoidCallback onJoinSuccess) {
     showLoadingDialog(context);
 
     Provider.of<MultiplayerManager>(context).connect(room.id, role,

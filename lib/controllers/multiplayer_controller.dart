@@ -3,6 +3,8 @@ import 'package:connect_5/helpers/multiplayer_manager.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
+import 'package:connect_5/models/multiplayer/room_event.dart';
+import 'package:connect_5/util.dart';
 import 'package:flutter/material.dart';
 
 class MultiplayerGameController extends GameController with BoardSpotPaintersMixin implements MultiplayerGameEventHandler {
@@ -18,13 +20,14 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
   GameMode get gameMode => GameMode.twoPlayers;
 
   /// Side of the user. If side is null, then user is a spectator
-  final Side side;
+  Side get side => multiplayerManager.currentSide;
 
   Point lastStep;
 
-  MultiplayerGameController(this.multiplayerManager, this.settings, this.tickerProvider)
-    : side = multiplayerManager.currentSide,
-      _defaultGame = Game.createNew(multiplayerManager.currentRoom.settings.boardSize)
+  HandlerFunction<RoomEvent> roomEventHandler;
+
+  MultiplayerGameController(this.multiplayerManager, this.settings, this.roomEventHandler, this.tickerProvider)
+    : _defaultGame = Game.createNew(multiplayerManager.currentRoom.settings.boardSize)
   {
     initBoardSpotPainters();
 
@@ -81,15 +84,31 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
     selectedPoint = null;
   }
 
-  void handleGameStarted(Game game) {
-    // TODO: display some message or change status bar text
-    print('Game started!');
-    resetSpotPainters();
+  void handleEvent(RoomEvent event) {
+    switch (event.description) {
+      case RoomEventDescription.startGame:
+        _handleGameStarted();
+        break;
+      case RoomEventDescription.stepAdded:
+        _handleStepAdded();
+        break;
+      case RoomEventDescription.gameReset:
+        _handleGameReset();
+        break;
+      default:
+        break;
+    }
+    if (roomEventHandler != null) {
+      roomEventHandler(event);
+    }
+  }
 
+  void _handleGameStarted() {
+    resetSpotPainters();
     notifyListeners();
   }
 
-  void handleStepAdded(Game game) {
+  void _handleStepAdded() {
     if (game.currentSide == side || side == null) {
       // Highlight step taken by other player OR spectating
       removeHighlights();
@@ -110,9 +129,8 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
     notifyListeners();
   }
 
-  void handleAddStepFailed(Game game) {
+  void handleAddStepFailed() {
     // This should never happen, but just in case
-
     if (lastStep != null) {
       // Remove piece, as it is invalid
       removePiece(lastStep);
@@ -127,7 +145,7 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
     }
   }
 
-  void handleGameReset(Game game) {
+  void _handleGameReset() {
     resetSpotPainters();
     notifyListeners();
   }

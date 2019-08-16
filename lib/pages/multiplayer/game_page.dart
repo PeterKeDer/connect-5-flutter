@@ -8,6 +8,8 @@ import 'package:connect_5/helpers/stats_manager.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
+import 'package:connect_5/models/multiplayer/game_room.dart';
+import 'package:connect_5/models/multiplayer/room_event.dart';
 import 'package:connect_5/models/storable_games.dart';
 import 'package:connect_5/pages/multiplayer/room_info_page.dart';
 import 'package:flutter/material.dart';
@@ -15,12 +17,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:connect_5/components/game_board.dart';
 import 'package:connect_5/controllers/game_controller.dart';
-
-class GameEventMessage {
-  final String text;
-
-  GameEventMessage(this.text);
-}
 
 class MultiplayerGamePage extends StatefulWidget {
   @override
@@ -30,6 +26,9 @@ class MultiplayerGamePage extends StatefulWidget {
 // TODO: check for spectator support
 class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerProviderStateMixin {
   static const double DEFAULT_SPACING = 20;
+  static const double MESSAGE_SPACING = 3;
+  static const double MESSAGE_PADDING = 6;
+  static const MESSAGE_DURATION = Duration(seconds: 3);
 
   MultiplayerGameController gameController;
 
@@ -39,7 +38,8 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
 
   final _messageListKey = GlobalKey<AnimatedListState>();
 
-  List<GameEventMessage> messages = [];
+  RoomEventMessage _persistentMessage;
+  List<RoomEventMessage> _messages = [];
 
   @override
   void initState() {
@@ -50,6 +50,7 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
         gameController = MultiplayerGameController(
           Provider.of<MultiplayerManager>(context),
           Provider.of<SettingsManager>(context),
+          _handleEvent,
           this,
         );
         gameController.onGameEvent(_saveGame);
@@ -67,37 +68,137 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
   }
 
   Widget _buildMessageBlock(Animation<double> animation, String message) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 3),
+    padding: const EdgeInsets.symmetric(vertical: MESSAGE_SPACING),
     child: FadeTransition(
       opacity: animation,
       child: SizeTransition(
         axis: Axis.vertical,
         sizeFactor: animation,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            color: Theme.of(context).colorScheme.primary.withAlpha(GameStatusBar.BACKGROUND_ALPHA),
+        child: SlideTransition(
+          position: animation.drive(Tween(begin: Offset(0, -0.5), end: Offset.zero)),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: MESSAGE_PADDING, horizontal: 2 * MESSAGE_PADDING),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(MESSAGE_PADDING),
+              color: Theme.of(context).colorScheme.primary.withAlpha(GameStatusBar.BACKGROUND_ALPHA),
+            ),
+            child: Text(message),
           ),
-          child: Text(message),
         ),
       ),
     ),
   );
 
-  /// Displays a message that disappears after a short duration
-  void _displayMessage(GameEventMessage message) {
-    messages.insert(0, message);
-    _messageListKey.currentState.insertItem(0);
+  void _handleEvent(RoomEvent event) {
+    switch (event.description) {
+      case RoomEventDescription.userJoined:
+        final userEvent = event as UserEvent;
+        final user = userEvent.user;
+        if (user.id != multiplayerManager.userId) {
+          _displayMessage(localize(context, '\$user_\$role_joined_message', {
+            '\$user': user.displayNickname(context),
+            '\$role': localize(context, roleToString(userEvent.role)),
+          }));
+        }
+        break;
+      case RoomEventDescription.userDisconnected:
+        _displayMessage(localize(context, '\$user_left_message', {
+          '\$user': (event as UserEvent).user.displayNickname(context),
+        }));
+        break;
+      case RoomEventDescription.startGame:
+        _hidePersistentMessage();
+        _displayMessage(localize(context, 'game_started_message'));
 
-    Future.delayed(const Duration(seconds: 3), () {
+        if (gameController.side != null) {
+          final message = gameController.game.currentSide == gameController.side ? 'your_turn' : 'waiting_opponent_turn';
+          _showPersistentMessage(localize(context, message));
+        }
+        break;
+      case RoomEventDescription.stepAdded:
+        if (gameController.side != null) {
+          final message = gameController.game.currentSide == gameController.side ? 'your_turn' : 'waiting_opponent_turn';
+          _setPersistentMessage(localize(context, message));
+        }
+        break;
+      case RoomEventDescription.userSetRestart:
+        final user = (event as UserEvent).user;
+        if (user.id == multiplayerManager.userId) {
+          if (!multiplayerManager.currentRoom.gameInProgress) {
+            _showPersistentMessage(localize(context, 'waiting_opponent_restart_message'));
+          }
+        } else {
+          if (!multiplayerManager.currentRoom.gameInProgress) {
+            _displayMessage(localize(context, '\$user_set_restart_message', {
+              '\$user': user.displayNickname(context),
+            }));
+          }
+        }
+        break;
+      case RoomEventDescription.gameReset:
+        _hidePersistentMessage();
+        break;
+      case RoomEventDescription.gameEnded:
+        _hidePersistentMessage();
+        _displayMessage(localize(context, 'game_ended_message'));
+    }
+  }
+
+  /// Displays a message that disappears after a short duration
+  void _displayMessage(String text) {
+    final message = RoomEventMessage(text);
+    final index = _persistentMessage == null ? 0 : 1;
+
+    _messages.insert(index, message);
+    _messageListKey.currentState.insertItem(index);
+
+    Future.delayed(MESSAGE_DURATION, () {
       if (this.mounted) {
-        final index = messages.indexOf(message);
-        final text = messages.removeAt(index).text;
+        final index = _messages.indexOf(message);
+        if (index == -1) return;
+        final text = _messages.removeAt(index).text;
+
         _messageListKey.currentState.removeItem(index, (context, animation) => _buildMessageBlock(animation, text));
       }
     });
+  }
+
+  /// Display a message that will only disappear after calling [_hidePersistentMessage], or when another persistent
+  /// message need to be shown
+  void _showPersistentMessage(String text) {
+    _hidePersistentMessage();
+
+    _persistentMessage = RoomEventMessage(text);
+    _messages.insert(0, _persistentMessage);
+    _messageListKey.currentState.insertItem(0);
+  }
+
+  /// Change the current persistent message text without animating. If currently not showing any persistent message,
+  /// this will behave the same as [_showPersistentMessage]
+  void _setPersistentMessage(String text) {
+    if (_persistentMessage == null) {
+      _showPersistentMessage(text);
+      return;
+    }
+
+    _persistentMessage = RoomEventMessage(text);
+    _messages[0] = _persistentMessage;
+
+    // Triggers update
+    _messageListKey.currentState.setState(() {});
+  }
+
+  /// Hide the persistent message
+  void _hidePersistentMessage() {
+    if (_persistentMessage == null) {
+      return;
+    }
+
+    final text = _persistentMessage.text;
+    _messageListKey.currentState.removeItem(0, (context, animation) => _buildMessageBlock(animation, text));
+    _messages.removeAt(0);
+    _persistentMessage = null;
   }
 
   void _handleMenuButtonTapped() {
@@ -175,16 +276,16 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
                 )
               ),
               Positioned(
-                top: GameStatusBar.BAR_HEIGHT + DEFAULT_SPACING + 3,
+                top: GameStatusBar.BAR_HEIGHT + DEFAULT_SPACING + MESSAGE_SPACING,
                 left: DEFAULT_SPACING,
                 right: DEFAULT_SPACING,
                 child: AnimatedList(
                   key: _messageListKey,
-                  initialItemCount: messages.length,
+                  initialItemCount: _messages.length,
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   itemBuilder: (context, index, animation) {
-                    return _buildMessageBlock(animation, messages[index].text);
+                    return _buildMessageBlock(animation, _messages[index].text);
                   },
                 ),
               ),

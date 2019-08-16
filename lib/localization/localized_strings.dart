@@ -123,6 +123,16 @@ const ENGLISH = {
   'room_not_found_message': 'The room with given room ID is not found. Please verify that the ID entered is correct.',
   'cannot_get_room': 'Cannot Get Room',
   'cannot_get_room_message': 'Unable to get room with ID. Please check your internet connection and try again later.',
+
+  // Event messages
+  '\$user_\$role_joined_message': '\$role - \$user joined the room.',
+  '\$user_left_message': '\$user left the room.',
+  'game_started_message': 'The game has started!',
+  'game_ended_message': 'The game has ended.',
+  'waiting_opponent_restart_message': 'Waiting for opponent to restart...',
+  '\$user_set_restart_message': '\$user chooses to restart!',
+  'your_turn': 'Your turn!',
+  'waiting_opponent_turn': 'Waiting for opponent\'s turn...',
 };
 
 const CHINESE_SIMPLIFIED = {

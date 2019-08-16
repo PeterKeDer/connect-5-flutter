@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/multiplayer/game_room.dart';
 import 'package:connect_5/models/multiplayer/multiplayer_game.dart';
+import 'package:connect_5/models/multiplayer/room_event.dart';
 import 'package:connect_5/secrets.dart' as secrets;
 import 'package:connect_5/util.dart';
 import 'package:flutter/foundation.dart';
@@ -19,6 +20,8 @@ class Events {
   static const failToAddStep = 'fail-to-add-step';
   static const userSetRestart = 'user-set-restart';
   static const gameReset = 'game-reset';
+
+  static const roomUpdated = 'room-updated';
 }
 
 class UserEvents {
@@ -27,10 +30,7 @@ class UserEvents {
 }
 
 abstract class MultiplayerGameEventHandler {
-  void handleGameStarted(Game game);
-  void handleStepAdded(Game game);
-  void handleAddStepFailed(Game game);
-  void handleGameReset(Game game);
+  void handleEvent(RoomEvent event);
 }
 
 enum GetRoomError {
@@ -52,6 +52,7 @@ class MultiplayerManager extends ChangeNotifier {
 
   VoidCallback _joinSuccessHandler;
   HandlerFunction<JoinRoomError> _joinFailHandler;
+  VoidCallback _addStepFailedHandler;
 
   List<GameRoom> rooms;
   GameRoom currentRoom;
@@ -97,7 +98,7 @@ class MultiplayerManager extends ChangeNotifier {
     return false;
   }
 
-  void connect(String roomId, int role, {VoidCallback onJoinSuccess, HandlerFunction<JoinRoomError> onJoinFail}) async {
+  void connect(String roomId, GameRoomRole role, {VoidCallback onJoinSuccess, HandlerFunction<JoinRoomError> onJoinFail}) async {
     // Roles: 1 - player1, 2 - player2, 3 - spectator
     _joinSuccessHandler = onJoinSuccess;
     _joinFailHandler = onJoinFail;
@@ -111,7 +112,7 @@ class MultiplayerManager extends ChangeNotifier {
       'transports': ['websocket'], // required for iOS
       'query': {
         'roomId': roomId,
-        'role': role,
+        'role': roleToInt(role),
         'nickname': nickname,
       },
     });
@@ -151,44 +152,35 @@ class MultiplayerManager extends ChangeNotifier {
       _socket = null;
     });
 
-    _socket.on(Events.userJoined, (data) {
+    _socket.on(Events.roomUpdated, (data) {
       try {
         currentRoom = GameRoom.fromJson(data['room']);
+        notifyListeners();
 
-        if (data['user']['id'] == _socket.id && _joinSuccessHandler != null) {
-          _joinSuccessHandler();
-          _joinSuccessHandler = null;
+        final event = RoomEvent.fromJson(data['event']);
+
+        gameEventHandler?.handleEvent(event);
+
+        switch (event.description) {
+          case RoomEventDescription.userJoined:
+            try {
+              if ((event as UserEvent).user.id == _socket.id && _joinSuccessHandler != null) {
+                _joinSuccessHandler();
+                _joinSuccessHandler = null;
+              }
+            } catch (error) {}
+            break;
+          case RoomEventDescription.userSetRestart:
+            try {
+              if ((event as UserEvent).user.id == _socket.id) {
+                _localRestartGame = null;
+              }
+            } catch (error) {}
+            break;
+          default:
+            break;
         }
 
-        notifyListeners();
-
-      } catch (error) {}
-    });
-
-    _socket.on(Events.userDisconnected, (data) {
-      try {
-        currentRoom = GameRoom.fromJson(data['room']);
-        notifyListeners();
-      } catch (error) {}
-    });
-
-    _socket.on(Events.startGame, (data) {
-      try {
-        currentRoom = GameRoom.fromJson(data['room']);
-
-        gameEventHandler?.handleGameStarted(game);
-
-        notifyListeners();
-      } catch (error) {}
-    });
-
-    _socket.on(Events.stepAdded, (data) {
-      try {
-        currentRoom = GameRoom.fromJson(data['room']);
-
-        gameEventHandler?.handleStepAdded(game);
-
-        notifyListeners();
       } catch (error) {}
     });
 
@@ -196,34 +188,18 @@ class MultiplayerManager extends ChangeNotifier {
       try {
         currentRoom = GameRoom.fromJson(data['room']);
 
-        gameEventHandler?.handleAddStepFailed(game);
-
-        notifyListeners();
-      } catch (error) {}
-    });
-
-    _socket.on(Events.userSetRestart, (data) {
-      try {
-        currentRoom = GameRoom.fromJson(data['room']);
-
-        _localRestartGame = null;
-
-        notifyListeners();
-      } catch (error) {}
-    });
-
-    _socket.on(Events.gameReset, (data) {
-      try {
-        currentRoom = GameRoom.fromJson(data['room']);
-
-        gameEventHandler?.handleGameReset(game);
+        if (_addStepFailedHandler != null) {
+          _addStepFailedHandler();
+          _addStepFailedHandler = null;
+        }
 
         notifyListeners();
       } catch (error) {}
     });
   }
 
-  void addStep(Point point) {
+  void addStep(Point point, {VoidCallback onAddStepFailed}) {
+    _addStepFailedHandler = onAddStepFailed;
     _socket.emit(UserEvents.addStep, {
       'point': {
         'x': point.x,

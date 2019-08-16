@@ -5,14 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MultiplayerRoomInfoPage extends StatelessWidget {
-  String getDisplayName(BuildContext context, User user) {
-    if (user.id == Provider.of<MultiplayerManager>(context).userId) {
-      return localize(context, 'you');
-    } else {
-      return user.nickname ?? localize(context, 'guest');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final multiplayerManager = Provider.of<MultiplayerManager>(context);
@@ -44,7 +36,7 @@ class MultiplayerRoomInfoPage extends StatelessWidget {
           ),
           if (room.player1 != null)
             ListTile(
-              title: Text(getDisplayName(context, room.player1)),
+              title: Text(room.player1.displayNickname(context)),
             ),
 
           ListTile(
@@ -52,7 +44,7 @@ class MultiplayerRoomInfoPage extends StatelessWidget {
           ),
           if (room.player2 != null)
             ListTile(
-              title: Text(getDisplayName(context, room.player2)),
+              title: Text(room.player2.displayNickname(context)),
             ),
 
           if (room.settings.allowSpectators)
@@ -62,7 +54,7 @@ class MultiplayerRoomInfoPage extends StatelessWidget {
               ),
               for (final spectator in room.spectators)
                 ListTile(
-                  title: Text(getDisplayName(context, spectator)),
+                  title: Text(spectator.displayNickname(context)),
                 )
             ],
         ],
