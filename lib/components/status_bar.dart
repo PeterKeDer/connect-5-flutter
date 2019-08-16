@@ -6,65 +6,40 @@ import 'package:connect_5/models/game_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class GameStatusBar extends StatefulWidget {
-  final GameController gameController;
-  final VoidCallback handleMenuButtonTapped;
-
-  GameStatusBar({this.gameController, this.handleMenuButtonTapped});
-
-  @override
-  _GameStatusBarState createState() => _GameStatusBarState();
-}
-
-class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProviderStateMixin {
+class GameStatusBar extends StatelessWidget {
   static const double SPACING = 20;
   static const double BAR_HEIGHT = 80;
   static const double BORDER_RADIUS = 10;
   static const BACKGROUND_ALPHA = 180;
   static const ANIMATION_DURATION = Duration(milliseconds: 150);
 
-  AnimationController _pieceColorAnimationController;
-  Animation<Color> _pieceColorAnimation;
+  final VoidCallback handleMenuButtonTapped;
 
-  Color _currentColor;
-  Side _prevSide;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _pieceColorAnimationController = AnimationController(duration: ANIMATION_DURATION, vsync: this); 
-  }
-
-  @override
-  void dispose() {
-    _pieceColorAnimationController.dispose();
-
-    super.dispose();
-  }
+  GameStatusBar({this.handleMenuButtonTapped});
 
   Widget _buildMenuButton(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.menu),
-      onPressed: widget.handleMenuButtonTapped
+      onPressed: handleMenuButtonTapped
     );
   }
 
-  Widget _buildPieceIndicator(Side side) {
+  Widget _buildPieceIndicator(Color color) {
     final size = BAR_HEIGHT - SPACING;
 
-    return Container(
+    return AnimatedContainer(
+      duration: ANIMATION_DURATION,
       padding: EdgeInsets.only(right: SPACING),
       height: size,
       width: size,
       decoration: BoxDecoration(
-        color: _currentColor,
+        color: color,
         borderRadius: BorderRadius.circular(size / 2)
       ),
     );
   }
-  
-  Widget _buildStatusText(GameController gameController) {
+
+  Widget _buildStatusText(BuildContext context, GameController gameController) {
     String statusBarText;
     if (gameController.game.winner != null) {
       statusBarText = localize(context, gameController.game.winner.side == Side.black ? 'black_victory' : 'white_victory');
@@ -73,7 +48,7 @@ class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProvider
     } else {
       statusBarText = localize(context, getDisplayString(gameController.gameMode));
     }
-    
+
     return Text(
       statusBarText,
       style: TextStyle(
@@ -86,21 +61,8 @@ class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final gameController = Provider.of<GameController>(context);
-
-    if (_prevSide != gameController.game.currentSide) {
-      _prevSide = gameController.game.currentSide;
-      final boardTheme = Provider.of<SettingsManager>(context).boardTheme;
-      final color = _prevSide == Side.black ? boardTheme.blackPieceColor : boardTheme.whitePieceColor;
-
-      _pieceColorAnimationController.reset();
-      _pieceColorAnimation = ColorTween(begin: _currentColor, end: color).animate(_pieceColorAnimationController);
-      _pieceColorAnimation.addListener(() {
-        setState(() {
-          _currentColor = _pieceColorAnimation.value;
-        });
-      });
-      _pieceColorAnimationController.forward();
-    }
+    final theme = Provider.of<SettingsManager>(context).boardTheme;
+    final pieceColor = gameController.game.currentSide == Side.black ? theme.blackPieceColor : theme.whitePieceColor;
 
     return Container(
       height: BAR_HEIGHT,
@@ -114,8 +76,8 @@ class _GameStatusBarState extends State<GameStatusBar> with SingleTickerProvider
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             if (!gameController.game.isFinished)
-              _buildPieceIndicator(gameController.game.currentSide),
-            _buildStatusText(gameController),
+              _buildPieceIndicator(pieceColor),
+            _buildStatusText(context, gameController),
             _buildMenuButton(context)
           ],
         ),
