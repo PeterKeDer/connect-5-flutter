@@ -17,16 +17,20 @@ class Events {
   static const startGame = 'start-game';
   static const stepAdded = 'step-added';
   static const failToAddStep = 'fail-to-add-step';
+  static const userSetRestart = 'user-set-restart';
+  static const gameReset = 'game-reset';
 }
 
 class UserEvents {
   static const addStep = 'add-step';
+  static const restartGame = 'restart-game';
 }
 
 abstract class MultiplayerGameEventHandler {
   void handleGameStarted(Game game);
   void handleStepAdded(Game game);
   void handleAddStepFailed(Game game);
+  void handleGameReset(Game game);
 }
 
 enum GetRoomError {
@@ -55,6 +59,9 @@ class MultiplayerManager extends ChangeNotifier {
   String get userId => _socket?.id;
 
   Side get currentSide {
+    if (_socket == null) {
+      return null;
+    }
     if (_socket.id == currentRoom.player1?.id) {
       return Side.black;
     } else if (_socket.id == currentRoom.player2?.id) {
@@ -66,6 +73,29 @@ class MultiplayerManager extends ChangeNotifier {
   MultiplayerGame get game => currentRoom?.game;
 
   MultiplayerGameEventHandler gameEventHandler;
+
+  /// Temporary stores if user wants to restart game
+  bool _localRestartGame;
+
+  /// Can reset when game exist but no longer in process (due to finishing or player leaving),
+  /// is not spectator, and is not already restarting
+  bool get canResetGame {
+    if (_localRestartGame != null) {
+      return _localRestartGame;
+    }
+
+    if (game == null || currentRoom.gameInProgress) {
+      return false;
+    }
+
+    switch (currentSide) {
+      case Side.black:
+        return !currentRoom.player1Restart;
+      case Side.white:
+        return !currentRoom.player2Restart;
+    }
+    return false;
+  }
 
   void connect(String roomId, int role, {VoidCallback onJoinSuccess, HandlerFunction<JoinRoomError> onJoinFail}) async {
     // Roles: 1 - player1, 2 - player2, 3 - spectator
@@ -171,6 +201,26 @@ class MultiplayerManager extends ChangeNotifier {
         notifyListeners();
       } catch (error) {}
     });
+
+    _socket.on(Events.userSetRestart, (data) {
+      try {
+        currentRoom = GameRoom.fromJson(data['room']);
+
+        _localRestartGame = null;
+
+        notifyListeners();
+      } catch (error) {}
+    });
+
+    _socket.on(Events.gameReset, (data) {
+      try {
+        currentRoom = GameRoom.fromJson(data['room']);
+
+        gameEventHandler?.handleGameReset(game);
+
+        notifyListeners();
+      } catch (error) {}
+    });
   }
 
   void addStep(Point point) {
@@ -180,6 +230,15 @@ class MultiplayerManager extends ChangeNotifier {
         'y': point.y,
       },
     });
+  }
+
+  void resetGame() {
+    _localRestartGame = true;
+    if (canResetGame) {
+      _socket.emit(UserEvents.restartGame);
+    }
+
+    notifyListeners();
   }
 
   Future<List<GameRoom>> getRooms() async {

@@ -6,8 +6,8 @@ import 'package:connect_5/components/status_bar.dart';
 import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/helpers/stats_manager.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
+import 'package:connect_5/models/game.dart';
 import 'package:connect_5/models/game_mode.dart';
-import 'package:connect_5/models/multiplayer/multiplayer_game.dart';
 import 'package:connect_5/models/storable_games.dart';
 import 'package:connect_5/pages/multiplayer/room_info_page.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +27,9 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
 
   MultiplayerGameController gameController;
 
-  MultiplayerGame get game => gameController.game;
+  Game get game => gameController.game;
+
+  MultiplayerManager get multiplayerManager => Provider.of(context);
 
   @override
   void initState() {
@@ -41,13 +43,28 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
           this,
         );
         gameController.onGameEvent(_saveGame);
+
+        // Refresh when game updates
+        gameController.addListener(() => setState(() {}));
       });
     });
+  }
+
+  @override
+  void dispose() {
+    gameController.dispose();
+    super.dispose();
   }
 
   void _handleMenuButtonTapped() {
     PopupActionSheet(
       items: [
+        if (multiplayerManager.canResetGame)
+          PopupActionSheetItem(
+            leading: const Icon(Icons.refresh),
+            text: localize(context, 'restart'),
+            onTap: _handleRestartButtonTapped,
+          ),
         PopupActionSheetItem(
           leading: const Icon(Icons.info_outline),
           text: localize(context, 'room_info'),
@@ -84,6 +101,12 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
     }
   }
 
+  void _handleRestartButtonTapped() {
+    if (multiplayerManager.canResetGame) {
+      multiplayerManager.resetGame();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (gameController == null) {
@@ -107,6 +130,19 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
                   handleMenuButtonTapped: _handleMenuButtonTapped,
                 )
               ),
+              if (multiplayerManager.canResetGame)
+                Positioned(
+                  bottom: DEFAULT_SPACING,
+                  left: DEFAULT_SPACING,
+                  right: DEFAULT_SPACING,
+                  child: Center(
+                    child: RaisedButton.icon(
+                      icon: Icon(Icons.refresh),
+                      label: Text(localize(context, 'restart')),
+                      onPressed: _handleRestartButtonTapped,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

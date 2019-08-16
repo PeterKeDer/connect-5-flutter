@@ -25,8 +25,10 @@ class GameRoom {
   List<User> spectators;
   Game game;
   bool gameInProgress;
+  bool player1Restart;
+  bool player2Restart;
 
-  GameRoom(this.id, this.settings, this.player1, this.player2, this.spectators, this.game, this.gameInProgress);
+  GameRoom(this.id, this.settings, this.player1, this.player2, this.spectators, this.game, this.gameInProgress, this.player1Restart, this.player2Restart);
 
   GameRoom.fromJson(Map<String, dynamic> json) : id = guardTypeNotNull(json['id']) {
     Map<String, dynamic> settingsJson = guardType(json['settings']);
@@ -58,5 +60,7 @@ class GameRoom {
     }
 
     gameInProgress = guardType(json['gameInProgress']) ?? false;
+    player1Restart = guardType(json['player1Restart']) ?? false;
+    player2Restart = guardType(json['player2Restart']) ?? false;
   }
 }

@@ -102,6 +102,7 @@ const ENGLISH = {
   'create_room': 'Create Room',
   'not_allowed': 'Not Allowed',
   'search': 'Search',
+  'restart': 'Restart',
 
   // Multiplayer errors
   'connection_failed': 'Connection Failed',

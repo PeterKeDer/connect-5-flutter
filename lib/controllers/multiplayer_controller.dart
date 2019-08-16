@@ -84,6 +84,9 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
   void handleGameStarted(Game game) {
     // TODO: display some message or change status bar text
     print('Game started!');
+    resetSpotPainters();
+
+    notifyListeners();
   }
 
   void handleStepAdded(Game game) {
@@ -122,5 +125,16 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
 
       notifyListeners();
     }
+  }
+
+  void handleGameReset(Game game) {
+    resetSpotPainters();
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    multiplayerManager.gameEventHandler = null;
+    super.dispose();
   }
 }

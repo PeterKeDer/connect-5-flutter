@@ -57,6 +57,12 @@ mixin BoardSpotPaintersMixin on GameController {
     }
   }
 
+  void resetSpotPainters() {
+    removeAllPieces();
+    removeHighlights();
+    selectedPoint = null;
+  }
+
   void addPiece(Point point, Side side) {
     spotPainters[point.x][point.y].addPieceAnimated(side);
   }
@@ -67,6 +73,14 @@ mixin BoardSpotPaintersMixin on GameController {
 
   void removePiece(Point point) {
     spotPainters[point.x][point.y].removePieceAnimated();
+  }
+
+  void removeAllPieces() {
+    for (final row in spotPainters) {
+      for (final painter in row) {
+        painter.removePieceAnimated();
+      }
+    }
   }
 
   /// Returns false if needed to tap again on the same spot to proceed
