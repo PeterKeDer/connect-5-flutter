@@ -26,6 +26,8 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
 
   HandlerFunction<RoomEvent> roomEventHandler;
 
+  bool stepTaken = false;
+
   MultiplayerGameController(this.multiplayerManager, this.settings, this.roomEventHandler, this.tickerProvider)
     : _defaultGame = Game.createNew(multiplayerManager.currentRoom.settings.boardSize)
   {
@@ -44,7 +46,7 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
       return;
     }
 
-    if (game.currentSide != side) {
+    if (game.currentSide != side || stepTaken) {
       return;
     }
 
@@ -62,7 +64,8 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
       addPiece(point, side);
       highlightLastStep(point);
 
-      multiplayerManager.addStep(point);
+      multiplayerManager.addStep(point, onAddStepFailed: _handleAddStepFailed);
+      stepTaken = true;
 
       removeHighlights();
 
@@ -86,6 +89,11 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
 
   void handleEvent(RoomEvent event) {
     switch (event.description) {
+      case RoomEventDescription.userReconnected:
+        if ((event as UserEvent).user.id == multiplayerManager.userId) {
+          _handleReconnection();
+        }
+        break;
       case RoomEventDescription.startGame:
         _handleGameStarted();
         break;
@@ -109,6 +117,8 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
   }
 
   void _handleStepAdded() {
+    stepTaken = false;
+
     if (game.currentSide == side || side == null) {
       // Highlight step taken by other player OR spectating
       removeHighlights();
@@ -129,8 +139,8 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
     notifyListeners();
   }
 
-  void handleAddStepFailed() {
-    // This should never happen, but just in case
+  void _handleAddStepFailed() {
+    // Happens when internet is disconnected
     if (lastStep != null) {
       // Remove piece, as it is invalid
       removePiece(lastStep);
@@ -147,6 +157,20 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
 
   void _handleGameReset() {
     resetSpotPainters();
+    notifyListeners();
+  }
+
+  void _handleReconnection() {
+    // Reset game when reconnected in case of missed events / local events not received on server
+    resetSpotPainters();
+
+    stepTaken = false;
+    initBoardSpotPainters();
+
+    if (game.steps.isNotEmpty) {
+      highlightLastStep(game.steps.last);
+    }
+
     notifyListeners();
   }
 

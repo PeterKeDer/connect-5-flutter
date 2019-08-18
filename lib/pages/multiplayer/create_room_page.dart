@@ -69,6 +69,15 @@ class _MultiplayerCreateRoomPageState extends State<MultiplayerCreateRoomPage> {
         onJoinFail: (_) {
           hideDialog(context);
           _showError(CreateRoomError.unknown);
+        },
+        onReconnectFail: () {
+          showAlertDialog(
+            context: context,
+            title: localize(context, 'reconnect_failed'),
+            message: localize(context, 'reconnect_failed_message'),
+            // Pop until main menu
+            confirmButtonAction: () => Navigator.popUntil(context, (r) => r.isFirst),
+          );
         }
       );
     } on CreateRoomError catch (error) {

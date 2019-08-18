@@ -27,6 +27,7 @@ class Events {
 class UserEvents {
   static const addStep = 'add-step';
   static const restartGame = 'restart-game';
+  static const leaveGame = 'leave-game';
 }
 
 abstract class MultiplayerGameEventHandler {
@@ -42,7 +43,7 @@ enum CreateRoomError {
 }
 
 enum JoinRoomError {
-  unknown, invalidRole, invalidRoomId,
+  unknown, invalidRole, invalidRoomId, timeout,
 }
 
 class MultiplayerManager extends ChangeNotifier {
@@ -52,20 +53,21 @@ class MultiplayerManager extends ChangeNotifier {
 
   VoidCallback _joinSuccessHandler;
   HandlerFunction<JoinRoomError> _joinFailHandler;
+  VoidCallback _reconnectFailHandler;
   VoidCallback _addStepFailedHandler;
 
   List<GameRoom> rooms;
   GameRoom currentRoom;
 
-  String get userId => _socket?.id;
+  String userId;
 
   Side get currentSide {
-    if (_socket == null) {
+    if (_socket == null || userId == null) {
       return null;
     }
-    if (_socket.id == currentRoom.player1?.id) {
+    if (userId == currentRoom.player1?.id) {
       return Side.black;
-    } else if (_socket.id == currentRoom.player2?.id) {
+    } else if (userId == currentRoom.player2?.id) {
       return Side.white;
     }
     return null;
@@ -98,22 +100,70 @@ class MultiplayerManager extends ChangeNotifier {
     return false;
   }
 
-  void connect(String roomId, GameRoomRole role, {VoidCallback onJoinSuccess, HandlerFunction<JoinRoomError> onJoinFail}) async {
-    // Roles: 1 - player1, 2 - player2, 3 - spectator
-    _joinSuccessHandler = onJoinSuccess;
-    _joinFailHandler = onJoinFail;
+  void connect(
+    String roomId,
+    GameRoomRole role,
+    {VoidCallback onJoinSuccess,
+    HandlerFunction<JoinRoomError> onJoinFail,
+    VoidCallback onReconnectFail}
+  ) async {
 
     if (_socket != null) {
       return;
     }
 
+    try {
+      final response = await http.post(
+        '${secrets.SERVER_URI}/join-room',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'roomId': roomId,
+          'role': roleToInt(role),
+          'nickname': nickname,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        userId = json.decode(response.body)['userId'];
+
+        if (userId == null) {
+          onJoinFail(JoinRoomError.unknown);
+          return;
+        }
+
+      } else {
+        final errorString = json.decode(response.body)['error'] as String;
+
+        var error = JoinRoomError.unknown;
+
+        switch (errorString) {
+          case 'invalid_room_id':
+            error = JoinRoomError.invalidRoomId;
+            break;
+          case 'invalid_role':
+            error = JoinRoomError.invalidRole;
+            break;
+        }
+
+        onJoinFail(error);
+        return;
+      }
+    } catch (error) {
+      onJoinFail(JoinRoomError.unknown);
+      return;
+    }
+
+    _joinSuccessHandler = onJoinSuccess;
+    _joinFailHandler = onJoinFail;
+    _reconnectFailHandler = onReconnectFail;
+
     _socket = IO.io(secrets.SERVER_URI, <String, dynamic>{
       'forceNew': true, // create a new connection
       'transports': ['websocket'], // required for iOS
       'query': {
-        'roomId': roomId,
-        'role': roleToInt(role),
-        'nickname': nickname,
+        'userId': userId,
       },
     });
 
@@ -121,6 +171,8 @@ class MultiplayerManager extends ChangeNotifier {
   }
 
   void disconnect() {
+    _socket.emit(UserEvents.leaveGame);
+
     _socket.close();
     _socket = null;
 
@@ -131,21 +183,25 @@ class MultiplayerManager extends ChangeNotifier {
     _socket.on(Events.failToJoin, (data) {
       currentRoom = null;
 
-      if (_joinFailHandler != null) {
+      if (_joinFailHandler != null || _reconnectFailHandler != null) {
         var error = JoinRoomError.unknown;
+
         if (data is Map<String, dynamic>) {
           switch (data['error']) {
-            case 'invalid_room_id':
-              error = JoinRoomError.invalidRoomId;
-              break;
-            case 'invalid_role':
-              error = JoinRoomError.invalidRole;
+            // Only possible error at this point
+            case 'connection_timeout':
+              error = JoinRoomError.timeout;
               break;
           }
         }
 
-        _joinFailHandler(error);
-        _joinFailHandler = null;
+        if (_joinFailHandler != null) {
+          _joinFailHandler(error);
+          _joinFailHandler = null;
+        } else {
+          _reconnectFailHandler();
+          _reconnectFailHandler = null;
+        }
       }
 
       _socket.clearListeners();
@@ -164,7 +220,7 @@ class MultiplayerManager extends ChangeNotifier {
         switch (event.description) {
           case RoomEventDescription.userJoined:
             try {
-              if ((event as UserEvent).user.id == _socket.id && _joinSuccessHandler != null) {
+              if ((event as UserEvent).user.id == userId && _joinSuccessHandler != null) {
                 _joinSuccessHandler();
                 _joinSuccessHandler = null;
               }
@@ -172,7 +228,7 @@ class MultiplayerManager extends ChangeNotifier {
             break;
           case RoomEventDescription.userSetRestart:
             try {
-              if ((event as UserEvent).user.id == _socket.id) {
+              if ((event as UserEvent).user.id == userId) {
                 _localRestartGame = null;
               }
             } catch (error) {}
@@ -199,6 +255,11 @@ class MultiplayerManager extends ChangeNotifier {
   }
 
   void addStep(Point point, {VoidCallback onAddStepFailed}) {
+    if (_socket.disconnected) {
+      onAddStepFailed();
+      return;
+    }
+
     _addStepFailedHandler = onAddStepFailed;
     _socket.emit(UserEvents.addStep, {
       'point': {

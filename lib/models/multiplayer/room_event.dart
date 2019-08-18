@@ -4,6 +4,8 @@ import 'package:connect_5/util.dart';
 
 enum RoomEventDescription {
   userJoined,
+  userLeft,
+  userReconnected,
   userDisconnected,
   startGame,
   stepAdded,
@@ -21,8 +23,12 @@ abstract class RoomEvent {
     switch (description) {
       case 'user-joined':
         return UserEvent(RoomEventDescription.userJoined, User.fromJson(json['user']), roleFromInt(json['role']));
+      case 'user-left':
+        return UserEvent(RoomEventDescription.userLeft, User.fromJson(json['user']), roleFromInt(json['role']));
       case 'user-disconnected':
         return UserEvent(RoomEventDescription.userDisconnected, User.fromJson(json['user']), roleFromInt(json['role']));
+      case 'user-reconnected':
+        return UserEvent(RoomEventDescription.userReconnected, User.fromJson(json['user']), roleFromInt(json['role']));
       case 'start-game':
         return BasicRoomEvent(RoomEventDescription.startGame);
       case 'step-added':

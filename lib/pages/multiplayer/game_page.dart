@@ -57,6 +57,24 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
 
         // Refresh when game updates
         gameController.addListener(() => setState(() {}));
+
+        // If game started and user just joined, it will be too late to receive the game start event
+        if (multiplayerManager.currentRoom.gameInProgress && multiplayerManager.game.steps.isEmpty) {
+          final gameStartedMessage = RoomEventMessage(localize(context, 'game_started_message'));
+          _persistentMessage = RoomEventMessage(_gameTurnMessageText);
+
+          _messages = [
+            _persistentMessage,
+            gameStartedMessage,
+          ];
+
+          Future.delayed(MESSAGE_DURATION, () {
+            final index = _messages.indexOf(gameStartedMessage);
+            if (index == -1) return;
+            final text = _messages.removeAt(index).text;
+            _messageListKey.currentState.removeItem(index, (context, animation) => _buildMessageBlock(animation, text));
+          });
+        }
       });
     });
   }
@@ -102,25 +120,44 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
           }));
         }
         break;
-      case RoomEventDescription.userDisconnected:
+      case RoomEventDescription.userLeft:
         _displayMessage(localize(context, '\$user_left_message', {
           '\$user': (event as UserEvent).user.displayNickname(context),
         }));
         break;
+      case RoomEventDescription.userReconnected:
+        final userEvent = event as UserEvent;
+        final user = userEvent.user;
+
+        if (userEvent.role != GameRoomRole.spectator) {
+          _displayGameTurnMessage();
+        }
+
+        if (user.id == multiplayerManager.userId) {
+          _displayMessage(localize(context, 'reconnected_message'));
+        } else {
+          _displayMessage(localize(context, '\$user_reconnected_message', {
+            '\$user': user.displayNickname(context),
+          }));
+        }
+        break;
+      case RoomEventDescription.userDisconnected:
+        final userEvent = event as UserEvent;
+        _displayMessage(localize(context, '\$user_disconnected_message', {
+          '\$user': userEvent.user.displayNickname(context),
+        }));
+
+        if (userEvent.role != GameRoomRole.spectator && userEvent.user.id != multiplayerManager.userId) {
+          _showPersistentMessage(localize(context, 'waiting_opponent_reconnect'));
+        }
+        break;
       case RoomEventDescription.startGame:
         _hidePersistentMessage();
         _displayMessage(localize(context, 'game_started_message'));
-
-        if (gameController.side != null) {
-          final message = gameController.game.currentSide == gameController.side ? 'your_turn' : 'waiting_opponent_turn';
-          _showPersistentMessage(localize(context, message));
-        }
+        _displayGameTurnMessage();
         break;
       case RoomEventDescription.stepAdded:
-        if (gameController.side != null) {
-          final message = gameController.game.currentSide == gameController.side ? 'your_turn' : 'waiting_opponent_turn';
-          _setPersistentMessage(localize(context, message));
-        }
+        _displayGameTurnMessage();
         break;
       case RoomEventDescription.userSetRestart:
         final user = (event as UserEvent).user;
@@ -142,6 +179,16 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
       case RoomEventDescription.gameEnded:
         _hidePersistentMessage();
         _displayMessage(localize(context, 'game_ended_message'));
+    }
+  }
+
+  String get _gameTurnMessageText {
+    return localize(context, gameController.game.currentSide == gameController.side ? 'your_turn' : 'waiting_opponent_turn');
+  }
+
+  void _displayGameTurnMessage() {
+    if (gameController.side != null) {
+      _setPersistentMessage(_gameTurnMessageText);
     }
   }
 

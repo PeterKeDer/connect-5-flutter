@@ -53,6 +53,15 @@ mixin MultiplayerJoinRoomMixin {
         }
       },
       onJoinFail: (error) => _showErrorDialog(context, error),
+      onReconnectFail: () {
+        showAlertDialog(
+          context: context,
+          title: localize(context, 'reconnect_failed'),
+          message: localize(context, 'reconnect_failed_message'),
+          // Pop until main menu
+          confirmButtonAction: () => Navigator.popUntil(context, (r) => r.isFirst),
+        );
+      }
     );
   }
 
@@ -70,6 +79,10 @@ mixin MultiplayerJoinRoomMixin {
       case JoinRoomError.invalidRoomId:
         title = 'join_invalid_room_id';
         message = 'join_invalid_room_id_message';
+        break;
+      case JoinRoomError.timeout:
+        title = 'join_connection_timeout';
+        message = 'join_connection_timeout_message';
         break;
       case JoinRoomError.unknown:
         title = 'cannot_join_room';

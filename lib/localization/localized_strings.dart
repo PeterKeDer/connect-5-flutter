@@ -117,6 +117,8 @@ const ENGLISH = {
   'join_invalid_role_message': 'Cannot join room with role. It is likely that another player has already taken the spot.',
   'join_invalid_room_id': 'Invalid Room ID',
   'join_invalid_room_id_message': 'Cannot join room with ID. The room was probably deleted by the owner.',
+  'join_connection_timeout': 'Connection Timeout',
+  'join_connection_timeout_message': 'The connection has timed out. Please check your internet connection and try again.',
   'cannot_join_room': 'Cannot Join Room',
   'cannot_join_room_message': 'Unable to join the room. Please check your internet connection and try again later.',
   'room_not_found': 'Room Not Found',
@@ -127,12 +129,16 @@ const ENGLISH = {
   // Event messages
   '\$user_\$role_joined_message': '\$role - \$user joined the room.',
   '\$user_left_message': '\$user left the room.',
+  'reconnected_message': 'You have reconnected to the game.',
+  '\$user_reconnected_message': '\$user has reconnected to the game.',
+  '\$user_disconnected_message': '\$user has disconnected.',
   'game_started_message': 'The game has started!',
   'game_ended_message': 'The game has ended.',
   'waiting_opponent_restart_message': 'Waiting for opponent to restart...',
   '\$user_set_restart_message': '\$user chooses to restart!',
   'your_turn': 'Your turn!',
   'waiting_opponent_turn': 'Waiting for opponent\'s turn...',
+  'waiting_opponent_reconnect': 'Waiting for opponent to reconnect...',
 };
 
 const CHINESE_SIMPLIFIED = {
