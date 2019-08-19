@@ -7,11 +7,13 @@ import 'package:provider/provider.dart';
 class User {
   final String id;
   String nickname;
+  bool isConnected;
 
-  User(this.id, this.nickname);
+  User(this.id, this.nickname, this.isConnected);
 
   User.fromJson(Map<String, dynamic> json) : id = guardTypeNotNull(json['id']) {
     nickname = guardType(json['nickname']);
+    isConnected = guardType(json['isConnected']) ?? false;
   }
 
   String displayNickname(BuildContext context) {

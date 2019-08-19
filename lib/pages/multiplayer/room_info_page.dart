@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MultiplayerRoomInfoPage extends StatelessWidget {
+  Widget _buildUserRow(BuildContext context, User user) => ListTile(
+    title: Text(user.displayNickname(context)),
+    trailing: user.isConnected ? null : Icon(Icons.signal_wifi_off),
+  );
+
   @override
   Widget build(BuildContext context) {
     final multiplayerManager = Provider.of<MultiplayerManager>(context);
@@ -16,6 +21,10 @@ class MultiplayerRoomInfoPage extends StatelessWidget {
       ),
       body: ListView(
         children: <Widget>[
+          ListTile(
+            title: Text(localize(context, 'room_id')),
+            trailing: Text(room.id),
+          ),
           ListTile(
             subtitle: Text(localize(context, 'room_settings')),
           ),
@@ -35,17 +44,13 @@ class MultiplayerRoomInfoPage extends StatelessWidget {
             subtitle: Text(localize(context, 'player_1')),
           ),
           if (room.player1 != null)
-            ListTile(
-              title: Text(room.player1.displayNickname(context)),
-            ),
+            _buildUserRow(context, room.player1),
 
           ListTile(
             subtitle: Text(localize(context, 'player_2')),
           ),
           if (room.player2 != null)
-            ListTile(
-              title: Text(room.player2.displayNickname(context)),
-            ),
+            _buildUserRow(context, room.player2),
 
           if (room.settings.allowSpectators)
             ...[
@@ -53,9 +58,7 @@ class MultiplayerRoomInfoPage extends StatelessWidget {
                 subtitle: Text(localize(context, 'spectators')),
               ),
               for (final spectator in room.spectators)
-                ListTile(
-                  title: Text(spectator.displayNickname(context)),
-                )
+                _buildUserRow(context, spectator),
             ],
         ],
       )
