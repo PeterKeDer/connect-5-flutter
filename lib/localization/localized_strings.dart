@@ -103,6 +103,7 @@ const ENGLISH = {
   'not_allowed': 'Not Allowed',
   'search': 'Search',
   'restart': 'Restart',
+  'nickname': 'Nickname',
 
   // Multiplayer errors
   'connection_failed': 'Connection Failed',

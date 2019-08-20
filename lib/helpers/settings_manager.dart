@@ -71,6 +71,8 @@ class SettingsManager extends ChangeNotifier implements Settings {
     ),
   };
 
+  static const MULTIPLAYER_NICKNAME_KEY = 'MULTIPLAYER_NICKNAME_KEY';
+
   SharedPreferences preferences;
 
   Future<void> initAsync() {
@@ -88,6 +90,7 @@ class SettingsManager extends ChangeNotifier implements Settings {
     _isDarkMode = preferences.getBool(APP_DARK_MODE_KEY) ?? false;
     _appAccentString = preferences.getString(APP_ACCENT_KEY) ?? APP_ACCENT.keys.first;
     _boardThemeString = preferences.getString(BOARD_THEME_KEY) ?? BOARD_THEME.keys.first;
+    _multiplayerNickname = preferences.getString(MULTIPLAYER_NICKNAME_KEY);
 
     notifyListeners();
   }
@@ -181,6 +184,17 @@ class SettingsManager extends ChangeNotifier implements Settings {
   set boardThemeString(String value) {
     _boardThemeString = value;
     preferences.setString(BOARD_THEME_KEY, value);
+    notifyListeners();
+  }
+
+  String _multiplayerNickname;
+
+  String get multiplayerNickname => _multiplayerNickname;
+
+  set multiplayerNickname(String value) {
+    value = value?.trim().length != 0 ? value : '';
+    _multiplayerNickname = value;
+    preferences.setString(MULTIPLAYER_NICKNAME_KEY, value);
     notifyListeners();
   }
 }

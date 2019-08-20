@@ -132,7 +132,29 @@ class SettingsPage extends StatelessWidget {
             title: Text(localize(context, 'board_theme')),
             trailing: Text(localize(context, settingsManager.boardThemeString)),
             onTap: () => _showBoardThemeOptions(context),
-          )
+          ),
+          ListTile(
+            subtitle: Text(localize(context, 'multiplayer')),
+          ),
+          ListTile(
+            title: TextField(
+              autocorrect: false,
+              textCapitalization: TextCapitalization.none,
+              decoration: InputDecoration(
+                labelText: localize(context, 'nickname'),
+              ),
+              controller: TextEditingController.fromValue(TextEditingValue(
+                text: settingsManager.multiplayerNickname ?? '',
+                selection: TextSelection.fromPosition(
+                  TextPosition(offset: (settingsManager.multiplayerNickname ?? '').length)
+                ),
+              )),
+              onSubmitted: (nickname) => settingsManager.multiplayerNickname = nickname,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+          ),
         ],
       )
     );

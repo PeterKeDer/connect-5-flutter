@@ -52,8 +52,9 @@ class _MultiplayerCreateRoomPageState extends State<MultiplayerCreateRoomPage> {
     showLoadingDialog(context);
 
     final multiplayerManager = Provider.of<MultiplayerManager>(context);
+    final nickname = Provider.of<SettingsManager>(context).multiplayerNickname;
 
-    multiplayerManager.createRoom(roomId, role, boardSize, allowSpectators, isPublic,
+    multiplayerManager.createRoom(nickname, roomId, role, boardSize, allowSpectators, isPublic,
       MultiplayerRoomConnectionHandler(
         joinSuccessHandler: () {
           hideDialog(context);

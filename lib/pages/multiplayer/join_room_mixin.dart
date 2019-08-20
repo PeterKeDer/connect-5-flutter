@@ -2,6 +2,7 @@
 import 'package:connect_5/components/dialogs.dart';
 import 'package:connect_5/components/popup_action_sheet.dart';
 import 'package:connect_5/helpers/multiplayer_manager.dart';
+import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/models/multiplayer/game_room.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,9 @@ mixin MultiplayerJoinRoomMixin {
   void _connectToRoom(BuildContext context, GameRoom room, GameRoomRole role, VoidCallback onJoinSuccess) {
     showLoadingDialog(context);
 
-    Provider.of<MultiplayerManager>(context).joinRoom(room.id, role,
+    final nickname = Provider.of<SettingsManager>(context).multiplayerNickname;
+
+    Provider.of<MultiplayerManager>(context).joinRoom(nickname, room.id, role,
       MultiplayerRoomConnectionHandler(
         joinSuccessHandler: () {
           hideDialog(context);

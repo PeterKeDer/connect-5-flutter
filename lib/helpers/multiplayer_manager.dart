@@ -13,13 +13,7 @@ import 'package:http/http.dart' as http;
 class Events {
   static const connection = 'connection';
   static const failToJoin = 'fail-to-join';
-  static const userJoined = 'user-joined';
-  static const userDisconnected = 'user-disconnected';
-  static const startGame = 'start-game';
-  static const stepAdded = 'step-added';
   static const failToAddStep = 'fail-to-add-step';
-  static const userSetRestart = 'user-set-restart';
-  static const gameReset = 'game-reset';
 
   static const roomUpdated = 'room-updated';
 }
@@ -56,8 +50,6 @@ enum JoinRoomError {
 
 class MultiplayerManager extends ChangeNotifier {
   IO.Socket _socket;
-
-  String nickname = 'TestNickname';
 
   MultiplayerRoomConnectionHandler connectionHandler;
 
@@ -273,7 +265,7 @@ class MultiplayerManager extends ChangeNotifier {
     }
   }
 
-  void joinRoom(String roomId, GameRoomRole role, MultiplayerRoomConnectionHandler connectionHandler) async {
+  void joinRoom(String nickname, String roomId, GameRoomRole role, MultiplayerRoomConnectionHandler connectionHandler) async {
     if (_socket != null) {
       return;
     }
@@ -325,6 +317,7 @@ class MultiplayerManager extends ChangeNotifier {
   }
 
   void createRoom(
+    String nickname,
     String roomId,
     GameRoomRole role,
     int boardSize,
@@ -341,6 +334,7 @@ class MultiplayerManager extends ChangeNotifier {
         },
         body: json.encode({
           'id': roomId,
+          'nickname': nickname,
           'role': roleToInt(role),
           'settings': {
             'boardSize': boardSize,
