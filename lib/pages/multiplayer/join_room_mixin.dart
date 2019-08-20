@@ -44,24 +44,25 @@ mixin MultiplayerJoinRoomMixin {
   void _connectToRoom(BuildContext context, GameRoom room, GameRoomRole role, VoidCallback onJoinSuccess) {
     showLoadingDialog(context);
 
-    Provider.of<MultiplayerManager>(context).connect(room.id, role,
-      onJoinSuccess: () {
-        hideDialog(context);
+    Provider.of<MultiplayerManager>(context).joinRoom(room.id, role,
+      MultiplayerRoomConnectionHandler(
+        joinSuccessHandler: () {
+          hideDialog(context);
 
-        if (onJoinSuccess != null) {
-          onJoinSuccess();
+          if (onJoinSuccess != null) {
+            onJoinSuccess();
+          }
+        },
+        joinFailHandler: (error) => _showErrorDialog(context, error),
+        reconnectFailHandler: () {
+          showAlertDialog(
+            context: context,
+            title: localize(context, 'reconnect_failed'),
+            message: localize(context, 'reconnect_failed_message'),
+            confirmButtonAction: () => Navigator.popUntil(context, (r) => r.isFirst),
+          );
         }
-      },
-      onJoinFail: (error) => _showErrorDialog(context, error),
-      onReconnectFail: () {
-        showAlertDialog(
-          context: context,
-          title: localize(context, 'reconnect_failed'),
-          message: localize(context, 'reconnect_failed_message'),
-          // Pop until main menu
-          confirmButtonAction: () => Navigator.popUntil(context, (r) => r.isFirst),
-        );
-      }
+      ),
     );
   }
 

@@ -53,11 +53,9 @@ class _MultiplayerCreateRoomPageState extends State<MultiplayerCreateRoomPage> {
 
     final multiplayerManager = Provider.of<MultiplayerManager>(context);
 
-    try {
-      final room = await multiplayerManager.createRoom(roomId, boardSize, allowSpectators, isPublic);
-
-      multiplayerManager.connect(room.id, role,
-        onJoinSuccess: () {
+    multiplayerManager.createRoom(roomId, role, boardSize, allowSpectators, isPublic,
+      MultiplayerRoomConnectionHandler(
+        joinSuccessHandler: () {
           hideDialog(context);
           Navigator.of(context)..pop()..push(
             MaterialPageRoute(
@@ -66,11 +64,11 @@ class _MultiplayerCreateRoomPageState extends State<MultiplayerCreateRoomPage> {
             ),
           );
         },
-        onJoinFail: (_) {
+        joinFailHandler: (_) {
           hideDialog(context);
           _showError(CreateRoomError.unknown);
         },
-        onReconnectFail: () {
+        reconnectFailHandler: () {
           showAlertDialog(
             context: context,
             title: localize(context, 'reconnect_failed'),
@@ -78,12 +76,13 @@ class _MultiplayerCreateRoomPageState extends State<MultiplayerCreateRoomPage> {
             // Pop until main menu
             confirmButtonAction: () => Navigator.popUntil(context, (r) => r.isFirst),
           );
-        }
-      );
-    } on CreateRoomError catch (error) {
-      hideDialog(context);
-      _showError(error);
-    }
+        },
+      ),
+      createRoomErrorHandler: (error) {
+        hideDialog(context);
+        _showError(error);
+      },
+    );
   }
 
   void _showError(CreateRoomError error) {

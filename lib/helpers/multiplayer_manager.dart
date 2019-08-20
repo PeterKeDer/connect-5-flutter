@@ -34,6 +34,14 @@ abstract class MultiplayerGameEventHandler {
   void handleEvent(RoomEvent event);
 }
 
+class MultiplayerRoomConnectionHandler {
+  VoidCallback joinSuccessHandler;
+  HandlerFunction<JoinRoomError> joinFailHandler;
+  VoidCallback reconnectFailHandler;
+
+  MultiplayerRoomConnectionHandler({this.joinSuccessHandler, this.joinFailHandler, this.reconnectFailHandler});
+}
+
 enum GetRoomError {
   unknown, invalidRoomId, roomNotFound,
 }
@@ -51,9 +59,8 @@ class MultiplayerManager extends ChangeNotifier {
 
   String nickname = 'TestNickname';
 
-  VoidCallback _joinSuccessHandler;
-  HandlerFunction<JoinRoomError> _joinFailHandler;
-  VoidCallback _reconnectFailHandler;
+  MultiplayerRoomConnectionHandler connectionHandler;
+
   VoidCallback _addStepFailedHandler;
 
   List<GameRoom> rooms;
@@ -100,64 +107,9 @@ class MultiplayerManager extends ChangeNotifier {
     return false;
   }
 
-  void connect(
-    String roomId,
-    GameRoomRole role,
-    {VoidCallback onJoinSuccess,
-    HandlerFunction<JoinRoomError> onJoinFail,
-    VoidCallback onReconnectFail}
-  ) async {
-
-    if (_socket != null) {
-      return;
-    }
-
-    try {
-      final response = await http.post(
-        '${secrets.SERVER_URI}/join-room',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
-          'roomId': roomId,
-          'role': roleToInt(role),
-          'nickname': nickname,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        userId = json.decode(response.body)['userId'];
-
-        if (userId == null) {
-          onJoinFail(JoinRoomError.unknown);
-          return;
-        }
-
-      } else {
-        final errorString = json.decode(response.body)['error'] as String;
-
-        var error = JoinRoomError.unknown;
-
-        switch (errorString) {
-          case 'invalid_room_id':
-            error = JoinRoomError.invalidRoomId;
-            break;
-          case 'invalid_role':
-            error = JoinRoomError.invalidRole;
-            break;
-        }
-
-        onJoinFail(error);
-        return;
-      }
-    } catch (error) {
-      onJoinFail(JoinRoomError.unknown);
-      return;
-    }
-
-    _joinSuccessHandler = onJoinSuccess;
-    _joinFailHandler = onJoinFail;
-    _reconnectFailHandler = onReconnectFail;
+  // TODO: TEST THIS SHIT!!!!!!!!
+  void _connect(String userId, MultiplayerRoomConnectionHandler connectionHandler) {
+    this.connectionHandler = connectionHandler;
 
     _socket = IO.io(secrets.SERVER_URI, <String, dynamic>{
       'forceNew': true, // create a new connection
@@ -183,7 +135,7 @@ class MultiplayerManager extends ChangeNotifier {
     _socket.on(Events.failToJoin, (data) {
       currentRoom = null;
 
-      if (_joinFailHandler != null || _reconnectFailHandler != null) {
+      if (connectionHandler?.joinFailHandler != null || connectionHandler?.reconnectFailHandler != null) {
         var error = JoinRoomError.unknown;
 
         if (data is Map<String, dynamic>) {
@@ -195,12 +147,12 @@ class MultiplayerManager extends ChangeNotifier {
           }
         }
 
-        if (_joinFailHandler != null) {
-          _joinFailHandler(error);
-          _joinFailHandler = null;
+        if (connectionHandler?.joinFailHandler != null) {
+          connectionHandler?.joinFailHandler(error);
+          connectionHandler?.joinFailHandler = null; // ? should this be done?
         } else {
-          _reconnectFailHandler();
-          _reconnectFailHandler = null;
+          connectionHandler?.reconnectFailHandler();
+          connectionHandler?.reconnectFailHandler = null;
         }
       }
 
@@ -220,9 +172,9 @@ class MultiplayerManager extends ChangeNotifier {
         switch (event.description) {
           case RoomEventDescription.userJoined:
             try {
-              if ((event as UserEvent).user.id == userId && _joinSuccessHandler != null) {
-                _joinSuccessHandler();
-                _joinSuccessHandler = null;
+              if ((event as UserEvent).user.id == userId && connectionHandler?.joinSuccessHandler != null) {
+                connectionHandler?.joinSuccessHandler();
+                connectionHandler?.joinSuccessHandler = null;
               }
             } catch (error) {}
             break;
@@ -322,7 +274,66 @@ class MultiplayerManager extends ChangeNotifier {
     }
   }
 
-  Future<GameRoom> createRoom(String roomId, int boardSize, bool allowSpectators, bool isPublic) async {
+  void joinRoom(String roomId, GameRoomRole role, MultiplayerRoomConnectionHandler connectionHandler) async {
+    if (_socket != null) {
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        '${secrets.SERVER_URI}/join-room',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'roomId': roomId,
+          'role': roleToInt(role),
+          'nickname': nickname,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        userId = json.decode(response.body)['userId'];
+
+        if (userId == null) {
+          connectionHandler?.joinFailHandler(JoinRoomError.unknown);
+          return;
+        }
+
+        _connect(userId, connectionHandler);
+
+      } else {
+        final errorString = json.decode(response.body)['error'] as String;
+
+        var error = JoinRoomError.unknown;
+
+        switch (errorString) {
+          case 'invalid_room_id':
+            error = JoinRoomError.invalidRoomId;
+            break;
+          case 'invalid_role':
+            error = JoinRoomError.invalidRole;
+            break;
+        }
+
+        connectionHandler?.joinFailHandler(error);
+        return;
+      }
+    } catch (error) {
+      connectionHandler?.joinFailHandler(JoinRoomError.unknown);
+      return;
+    }
+  }
+
+  void createRoom(
+    String roomId,
+    GameRoomRole role,
+    int boardSize,
+    bool allowSpectators,
+    bool isPublic,
+    MultiplayerRoomConnectionHandler connectionHandler,
+    {HandlerFunction<CreateRoomError> createRoomErrorHandler}
+  ) async {
     try {
       final response = await http.post(
         '${secrets.SERVER_URI}/create-room',
@@ -331,6 +342,7 @@ class MultiplayerManager extends ChangeNotifier {
         },
         body: json.encode({
           'id': roomId,
+          'role': roleToInt(role),
           'settings': {
             'boardSize': boardSize,
             'allowSpectators': allowSpectators,
@@ -338,27 +350,39 @@ class MultiplayerManager extends ChangeNotifier {
           },
         }),
       );
+      print(response.body);
 
       if (response.statusCode == 200) {
-        final roomJson = json.decode(response.body)['room'];
-        return GameRoom.fromJson(roomJson);
+        userId = json.decode(response.body)['userId'];
+
+        if (userId == null) {
+          connectionHandler?.joinFailHandler(JoinRoomError.unknown);
+          return;
+        }
+
+// TODO: figure out hanlder issue: which Error type to use
+// definitely needs joinroom error to handle stuffs like reconnection, but still needs create room error for messages
+// maybe handler for join room error, and throw create room errors? but that would be inconsistent/confusing
+// TODO: actually make these three functions into a single RoomConnectionHandler delegate class
+        _connect(userId, connectionHandler);
 
       } else {
         final error = json.decode(response.body)['error'] as String;
 
         switch (error) {
           case 'room_id_taken':
-            throw CreateRoomError.roomIdTaken;
+            createRoomErrorHandler(CreateRoomError.roomIdTaken);
+            break;
           case 'invalid_room_id':
-            throw CreateRoomError.invalidRoomId;
+            createRoomErrorHandler(CreateRoomError.invalidRoomId);
+            break;
+          default:
+            createRoomErrorHandler(CreateRoomError.unknown);
+            break;
         }
-
-        throw CreateRoomError.unknown;
       }
-    } on CreateRoomError catch (error) {
-      throw error;
     } catch (error) {
-      throw CreateRoomError.unknown;
+      createRoomErrorHandler(CreateRoomError.unknown);
     }
   }
 }
