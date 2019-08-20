@@ -107,7 +107,6 @@ class MultiplayerManager extends ChangeNotifier {
     return false;
   }
 
-  // TODO: TEST THIS SHIT!!!!!!!!
   void _connect(String userId, MultiplayerRoomConnectionHandler connectionHandler) {
     this.connectionHandler = connectionHandler;
 
@@ -360,10 +359,6 @@ class MultiplayerManager extends ChangeNotifier {
           return;
         }
 
-// TODO: figure out hanlder issue: which Error type to use
-// definitely needs joinroom error to handle stuffs like reconnection, but still needs create room error for messages
-// maybe handler for join room error, and throw create room errors? but that would be inconsistent/confusing
-// TODO: actually make these three functions into a single RoomConnectionHandler delegate class
         _connect(userId, connectionHandler);
 
       } else {
