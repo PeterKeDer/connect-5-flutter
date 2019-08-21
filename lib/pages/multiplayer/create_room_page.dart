@@ -7,6 +7,7 @@ import 'package:connect_5/models/multiplayer/game_room.dart';
 import 'package:connect_5/pages/multiplayer/game_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class MultiplayerCreateRoomPage extends StatefulWidget {
@@ -126,6 +127,9 @@ class _MultiplayerCreateRoomPageState extends State<MultiplayerCreateRoomPage> {
             title: TextField(
               autocorrect: false,
               textCapitalization: TextCapitalization.none,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(MultiplayerManager.ROOM_ID_MAX_LENGTH),
+              ],
               decoration: InputDecoration(
                 labelText: localize(context, 'room_id'),
               ),

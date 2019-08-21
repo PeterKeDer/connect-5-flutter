@@ -72,6 +72,7 @@ class SettingsManager extends ChangeNotifier implements Settings {
   };
 
   static const MULTIPLAYER_NICKNAME_KEY = 'MULTIPLAYER_NICKNAME_KEY';
+  static const MULTIPLAYER_NICKNAME_MAX_LENGTH = 16; // after being trimmed
 
   SharedPreferences preferences;
 
@@ -192,9 +193,13 @@ class SettingsManager extends ChangeNotifier implements Settings {
   String get multiplayerNickname => _multiplayerNickname;
 
   set multiplayerNickname(String value) {
-    value = value?.trim().length != 0 ? value : '';
-    _multiplayerNickname = value;
-    preferences.setString(MULTIPLAYER_NICKNAME_KEY, value);
+    final trimmed = value.trim();
+    if (0 < trimmed.length && trimmed.length <= MULTIPLAYER_NICKNAME_MAX_LENGTH) {
+      _multiplayerNickname = trimmed;
+    } else {
+      _multiplayerNickname = null;
+    }
+    preferences.setString(MULTIPLAYER_NICKNAME_KEY, _multiplayerNickname);
     notifyListeners();
   }
 }

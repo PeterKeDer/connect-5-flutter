@@ -49,6 +49,8 @@ enum JoinRoomError {
 }
 
 class MultiplayerManager extends ChangeNotifier {
+  static const ROOM_ID_MAX_LENGTH = 16;
+
   IO.Socket _socket;
 
   MultiplayerRoomConnectionHandler connectionHandler;
@@ -326,6 +328,11 @@ class MultiplayerManager extends ChangeNotifier {
     MultiplayerRoomConnectionHandler connectionHandler,
     {HandlerFunction<CreateRoomError> createRoomErrorHandler}
   ) async {
+    if (roomId.length < 0 || roomId.length > ROOM_ID_MAX_LENGTH) {
+      createRoomErrorHandler(CreateRoomError.invalidRoomId);
+      return;
+    }
+
     try {
       final response = await http.post(
         '${secrets.SERVER_URI}/create-room',

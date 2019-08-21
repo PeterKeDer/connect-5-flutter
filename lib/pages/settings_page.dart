@@ -2,6 +2,7 @@ import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/localization/localization.dart';
 import 'package:connect_5/pages/settings_options_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -139,6 +140,9 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             title: TextField(
               autocorrect: false,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(SettingsManager.MULTIPLAYER_NICKNAME_MAX_LENGTH),
+              ],
               textCapitalization: TextCapitalization.none,
               decoration: InputDecoration(
                 labelText: localize(context, 'nickname'),

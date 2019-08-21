@@ -91,7 +91,9 @@ class _MultiplayerSearchRoomPageState extends State<MultiplayerSearchRoomPage> w
               decoration: InputDecoration(
                 labelText: localize(context, 'room_id'),
               ),
+              textInputAction: TextInputAction.search,
               onChanged: (roomId) => setState(() => this._roomId = roomId),
+              onSubmitted: (_) => _handleSearchButtonTapped(),
             ),
             trailing: RaisedButton(
               child: Text(localize(context, 'search')),
