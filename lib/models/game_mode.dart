@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 enum GameMode {
-  twoPlayers, blackBot, whiteBot
+  twoPlayers, blackBot, whiteBot, multiplayerBlack, multiplayerWhite, multiplayerSpectate
 }
 
 const LOCAL_GAME_MODES = [
   GameMode.twoPlayers,
   GameMode.blackBot,
-  GameMode.whiteBot
+  GameMode.whiteBot,
 ];
 
 GameMode gameModeFromString(String str) => GameMode.values.firstWhere((gameMode) => gameMode.toString() == str);
@@ -36,8 +36,9 @@ Widget getIcon(GameMode gameMode, {double size = 25, Color color = Colors.black4
           borderRadius: BorderRadius.circular(size / 2),
         ),
       );
+    default:
+      return null;
   }
-  return null;
 }
 
 String getDisplayString(GameMode gameMode) {
@@ -47,7 +48,13 @@ String getDisplayString(GameMode gameMode) {
     case GameMode.blackBot:
       return 'bot_black';
     case GameMode.whiteBot:
-    return 'bot_white';
+      return 'bot_white';
+    case GameMode.multiplayerBlack:
+      return 'multiplayer';
+    case GameMode.multiplayerWhite:
+      return 'multiplayer';
+    case GameMode.multiplayerSpectate:
+      return 'spectating';
   }
   return '';
 }

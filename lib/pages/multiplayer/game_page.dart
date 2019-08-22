@@ -7,7 +7,6 @@ import 'package:connect_5/helpers/settings_manager.dart';
 import 'package:connect_5/helpers/stats_manager.dart';
 import 'package:connect_5/helpers/storage_manager.dart';
 import 'package:connect_5/models/game.dart';
-import 'package:connect_5/models/game_mode.dart';
 import 'package:connect_5/models/multiplayer/game_room.dart';
 import 'package:connect_5/models/multiplayer/room_event.dart';
 import 'package:connect_5/models/storable_games.dart';
@@ -283,8 +282,7 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
 
   void _saveGame() {
     if (game.isFinished) {
-      // TODO: add correct game modes
-      final gameMode = GameMode.twoPlayers;
+      final gameMode = gameController.gameMode;
 
       // Save to replays
       final date = DateFormat('yyyy-MM-dd hh:mm:ss').format(DateTime.now());

@@ -27,42 +27,94 @@ class StatsManager extends ChangeNotifier {
   final _botWhiteGamesWon = StoredStat('games_won', 'BOT_WHITE_GAMES_WON');
   final _botWhiteGamesLost = StoredStat('games_lost', 'BOT_WHITE_GAMES_LOST');
 
+  final _multiplayerGamesPlayed = StoredStat('games_played', 'MULTIPLAYER_GAMES_PLAYED');
+  final _multiplayerGamesWon = StoredStat('games_won', 'MULTIPLAYER_GAMES_WON');
+  final _multiplayerGamesLost = StoredStat('games_lost', 'MULTIPLAYER_GAMES_LOST');
+
+  final _multiplayerGamesPlayedAsBlack = StoredStat('games_played', 'MULTIPLAYER_GAMES_PLAYED_AS_BLACK');
+  final _multiplayerGamesWonAsBlack = StoredStat('games_won', 'MULTIPLAYER_GAMES_WON_AS_BLACK');
+  final _multiplayerGamesLostAsBlack = StoredStat('games_lost', 'MULTIPLAYER_GAMES_LOST_AS_BLACK');
+
+  final _multiplayerGamesPlayedAsWhite = StoredStat('games_played', 'MULTIPLAYER_GAMES_PLAYED_AS_WHITE');
+  final _multiplayerGamesWonAsWhite = StoredStat('games_won', 'MULTIPLAYER_GAMES_WON_AS_WHITE');
+  final _multiplayerGamesLostAsWhite = StoredStat('games_lost', 'MULTIPLAYER_GAMES_LOST_AS_WHITE');
+
   Future<void> initAsync() {
     return SharedPreferences.getInstance().then(_initialize);
   }
 
   void recordGame(GameMode gameMode, Game game) {
+    if (gameMode == GameMode.multiplayerSpectate) return;
+
     _totalGamesPlayed.storedValue++;
 
-    if (gameMode == GameMode.twoPlayers) {
-      _twoPlayersGamesPlayed.storedValue++;
-    } else if (gameMode == GameMode.blackBot) {
-      _botBlackGamesPlayed.storedValue++;
-    } else {
-      _botWhiteGamesPlayed.storedValue++;
-    }
-
     final winner = game.winner?.side;
+
     if (winner == Side.black) {
       _totalBlackVictory.storedValue++;
-
-      if (gameMode == GameMode.twoPlayers) {
-        _twoPlayersBlackVictory.storedValue++;
-      } else if (gameMode == GameMode.blackBot) {
-        _botBlackGamesLost.storedValue++;
-      } else {
-        _botWhiteGamesWon.storedValue++;
-      }
     } else if (winner == Side.white) {
       _totalWhiteVictory.storedValue++;
+    }
 
-      if (gameMode == GameMode.twoPlayers) {
-        _twoPlayersWhiteVictory.storedValue++;
-      } else if (gameMode == GameMode.blackBot) {
-        _botBlackGamesWon.storedValue++;
-      } else {
-        _botWhiteGamesLost.storedValue++;
-      }
+    switch (gameMode) {
+      case GameMode.twoPlayers:
+        _twoPlayersGamesPlayed.storedValue++;
+
+        if (winner == Side.black) {
+          _twoPlayersBlackVictory.storedValue++;
+        } else if (winner == Side.white) {
+          _twoPlayersWhiteVictory.storedValue++;
+        }
+        break;
+
+      case GameMode.blackBot:
+        _botBlackGamesPlayed.storedValue++;
+
+        if (winner == Side.black) {
+          _botBlackGamesLost.storedValue++;
+        } else if (winner == Side.white) {
+          _botBlackGamesWon.storedValue++;
+        }
+        break;
+
+      case GameMode.whiteBot:
+        _botWhiteGamesPlayed.storedValue++;
+
+        if (winner == Side.black) {
+          _botWhiteGamesWon.storedValue++;
+        } else if (winner == Side.white) {
+          _botWhiteGamesLost.storedValue++;
+        }
+        break;
+
+      case GameMode.multiplayerBlack:
+        _multiplayerGamesPlayed.storedValue++;
+        _multiplayerGamesPlayedAsBlack.storedValue++;
+
+        if (winner == Side.black) {
+          _multiplayerGamesWon.storedValue++;
+          _multiplayerGamesWonAsBlack.storedValue++;
+        } else if (winner == Side.white) {
+          _multiplayerGamesLost.storedValue++;
+          _multiplayerGamesLostAsBlack.storedValue++;
+        }
+        break;
+
+      case GameMode.multiplayerWhite:
+        _multiplayerGamesPlayed.storedValue++;
+        _multiplayerGamesPlayedAsWhite.storedValue++;
+
+        if (winner == Side.black) {
+          _multiplayerGamesLost.storedValue++;
+          _multiplayerGamesLostAsWhite.storedValue++;
+        } else if (winner == Side.white) {
+          _multiplayerGamesWon.storedValue++;
+          _multiplayerGamesWonAsWhite.storedValue++;
+        }
+        break;
+
+      default:
+        break;
     }
 
     _save();
@@ -122,6 +174,33 @@ class StatsManager extends ChangeNotifier {
         _botWhiteGamesLost,
         ComputedStat('win_rate', () => _getWinRateString(_botWhiteGamesWon.storedValue, _botWhiteGamesPlayed.storedValue)),
       ]),
+      StatGroup('multiplayer', [
+        _multiplayerGamesPlayed,
+        _multiplayerGamesWon,
+        _multiplayerGamesLost,
+        ComputedStat('win_rate', () => _getWinRateString(
+          _multiplayerGamesWon.storedValue,
+          _multiplayerGamesPlayed.storedValue
+        )),
+      ]),
+      StatGroup('multiplayer_as_black', [
+        _multiplayerGamesPlayedAsBlack,
+        _multiplayerGamesWonAsBlack,
+        _multiplayerGamesLostAsBlack,
+        ComputedStat('win_rate', () => _getWinRateString(
+          _multiplayerGamesWonAsBlack.storedValue,
+          _multiplayerGamesPlayedAsBlack.storedValue
+        )),
+      ]),
+      StatGroup('multiplayer_as_white', [
+        _multiplayerGamesPlayedAsWhite,
+        _multiplayerGamesWonAsWhite,
+        _multiplayerGamesLostAsWhite,
+        ComputedStat('win_rate', () => _getWinRateString(
+          _multiplayerGamesWonAsWhite.storedValue,
+          _multiplayerGamesPlayedAsWhite.storedValue
+        )),
+      ]),
     ];
   }
 
@@ -144,7 +223,7 @@ class StatsManager extends ChangeNotifier {
   }
 
   String _getWinRateString(int win, int total) {
-    final winRate = (total == 0 ? 0 : (win / total)).toStringAsFixed(2);
+    final winRate = (total == 0 ? 0 : (win * 100 / total)).toStringAsFixed(2);
     return '$winRate%';
   }
 

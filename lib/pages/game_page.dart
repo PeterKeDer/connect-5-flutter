@@ -57,15 +57,17 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       newController = ReplayGameController(widget.game, gameMode, settings, this);
     } else {
       switch (gameMode) {
-      case GameMode.twoPlayers:
-        newController = LocalTwoPlayerGameController(game, settings, this);
-        break;
-      case GameMode.blackBot:
-        newController = LocalBotGameController(game, MinMaxBot(), Side.black, settings, this);
-        break;
-      case GameMode.whiteBot:
-        newController = LocalBotGameController(game, MinMaxBot(), Side.white, settings, this);
-        break;
+        case GameMode.twoPlayers:
+          newController = LocalTwoPlayerGameController(game, settings, this);
+          break;
+        case GameMode.blackBot:
+          newController = LocalBotGameController(game, MinMaxBot(), Side.black, settings, this);
+          break;
+        case GameMode.whiteBot:
+          newController = LocalBotGameController(game, MinMaxBot(), Side.white, settings, this);
+          break;
+        default:
+          break;
       }
     }
 
@@ -89,7 +91,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       _startGame(widget.game);
     }
   }
-  
+
   void _handleMenuButtonTapped() {
     PopupActionSheet(
       items: [

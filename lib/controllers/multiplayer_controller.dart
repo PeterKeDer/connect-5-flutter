@@ -16,8 +16,16 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
   final Settings settings;
   final TickerProvider tickerProvider;
 
-  // TODO: add gamemode
-  GameMode get gameMode => GameMode.twoPlayers;
+  GameMode get gameMode {
+    switch (side) {
+      case Side.black:
+        return GameMode.multiplayerBlack;
+      case Side.white:
+        return GameMode.multiplayerWhite;
+      default:
+        return GameMode.multiplayerSpectate;
+    }
+  }
 
   /// Side of the user. If side is null, then user is a spectator
   Side get side => multiplayerManager.currentSide;
@@ -69,7 +77,6 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
 
       removeHighlights();
 
-      gameEventListener();
       notifyListeners();
 
     } on GameError catch (error) {
@@ -136,6 +143,8 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
       highlightWinningMoves(game.winner.points);
     }
 
+    gameEventListener();
+
     notifyListeners();
   }
 
@@ -148,8 +157,6 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
       lastStep = null;
 
       highlightLastStep(game.steps.last);
-
-      // TODO: maybe display a message
 
       notifyListeners();
     }

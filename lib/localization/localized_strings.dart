@@ -83,6 +83,8 @@ const ENGLISH = {
 
   // Multiplayer
   'multiplayer': 'Multiplayer',
+  'multiplayer_as_black': 'Multiplayer as Black',
+  'multiplayer_as_white': 'Multiplayer as White',
   'player_1': 'Player 1',
   'player_2': 'Player 2',
   'spectator': 'Spectator',
@@ -104,6 +106,7 @@ const ENGLISH = {
   'search': 'Search',
   'restart': 'Restart',
   'nickname': 'Nickname',
+  'spectating': 'Spectating',
 
   // Multiplayer errors
   'connection_failed': 'Connection Failed',
