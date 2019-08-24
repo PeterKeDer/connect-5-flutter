@@ -104,7 +104,7 @@ class MultiplayerManager extends ChangeNotifier {
   void _connect(String userId, MultiplayerRoomConnectionHandler connectionHandler) {
     this.connectionHandler = connectionHandler;
 
-    _socket = IO.io(secrets.SERVER_URI, <String, dynamic>{
+    _socket = IO.io(secrets.serverUri, <String, dynamic>{
       'forceNew': true, // create a new connection
       'transports': ['websocket'], // required for iOS
       'query': {
@@ -225,7 +225,7 @@ class MultiplayerManager extends ChangeNotifier {
 
   Future<List<GameRoom>> getRooms() async {
     try {
-      final response = await http.get('${secrets.SERVER_URI}/rooms');
+      final response = await http.get('${secrets.serverUri}/rooms');
 
       final roomsData = json.decode(response.body)['rooms'];
       rooms = List.from(roomsData.map((data) => GameRoom.fromJson(data)));
@@ -242,7 +242,7 @@ class MultiplayerManager extends ChangeNotifier {
 
   Future<GameRoom> getRoom(String roomId) async {
     try {
-      final response = await http.get(Uri.encodeFull('${secrets.SERVER_URI}/rooms/$roomId'));
+      final response = await http.get(Uri.encodeFull('${secrets.serverUri}/rooms/$roomId'));
 
       if (response.statusCode == 200) {
         final roomJson = json.decode(response.body)['room'];
@@ -274,7 +274,7 @@ class MultiplayerManager extends ChangeNotifier {
 
     try {
       final response = await http.post(
-        '${secrets.SERVER_URI}/join-room',
+        '${secrets.serverUri}/join-room',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -335,7 +335,7 @@ class MultiplayerManager extends ChangeNotifier {
 
     try {
       final response = await http.post(
-        '${secrets.SERVER_URI}/create-room',
+        '${secrets.serverUri}/create-room',
         headers: {
           'Content-Type': 'application/json',
         },
