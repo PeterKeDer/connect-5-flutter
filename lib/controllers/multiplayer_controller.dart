@@ -130,7 +130,7 @@ class MultiplayerGameController extends GameController with BoardSpotPaintersMix
       // Highlight step taken by other player OR spectating
       removeHighlights();
 
-      addPiece(game.steps.last, toggleSide(side));
+      addPiece(game.steps.last, toggleSide(game.currentSide));
 
       highlightLastStep(game.steps.last);
 

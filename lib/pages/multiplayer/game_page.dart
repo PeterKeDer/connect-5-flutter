@@ -22,7 +22,6 @@ class MultiplayerGamePage extends StatefulWidget {
   _MultiplayerGamePageState createState() => _MultiplayerGamePageState();
 }
 
-// TODO: check for spectator support
 class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerProviderStateMixin {
   static const double DEFAULT_SPACING = 20;
   static const double MESSAGE_SPACING = 3;
