@@ -33,7 +33,8 @@ class Connect5App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIOverlays([]);
+    // Hide status bar but show bottom bar
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
 
     return MultiProvider(
       providers: [
