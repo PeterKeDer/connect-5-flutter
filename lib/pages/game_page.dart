@@ -145,22 +145,28 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     return ChangeNotifierProvider<GameController>.value(
       value: gameController,
-      child: Scaffold(
-        body: SafeArea(
-          child: Stack(
-            children: <Widget>[
-              Positioned.fill(
-                child: GameBoard()
-              ),
-              Positioned(
-                top: DEFAULT_SPACING,
-                left: DEFAULT_SPACING,
-                right: DEFAULT_SPACING,
-                child: GameStatusBar(
-                  handleMenuButtonTapped: _handleMenuButtonTapped,
-                )
-              ),
-            ],
+      child: WillPopScope(
+        onWillPop: () async {
+          _handleMenuButtonTapped();
+          return false;
+        },
+        child: Scaffold(
+          body: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: GameBoard()
+                ),
+                Positioned(
+                  top: DEFAULT_SPACING,
+                  left: DEFAULT_SPACING,
+                  right: DEFAULT_SPACING,
+                  child: GameStatusBar(
+                    handleMenuButtonTapped: _handleMenuButtonTapped,
+                  )
+                ),
+              ],
+            ),
           ),
         ),
       ),

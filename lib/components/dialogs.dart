@@ -1,19 +1,32 @@
 import 'package:connect_5/localization/localization.dart';
 import 'package:flutter/material.dart';
 
-void showLoadingDialog(BuildContext context) {
+void showLoadingDialog(BuildContext context, {String message, bool popDismissable = false}) {
   showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (context) => Center(
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Theme.of(context).backgroundColor,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
+    builder: (context) => WillPopScope(
+      onWillPop: () async => popDismissable,
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Theme.of(context).backgroundColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
+              ),
+              if (message != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Text(message, style: Theme.of(context).textTheme.body1),
+                ),
+            ],
+          ),
         ),
       ),
     ),

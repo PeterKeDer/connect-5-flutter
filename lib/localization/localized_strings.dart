@@ -107,6 +107,7 @@ const ENGLISH = {
   'restart': 'Restart',
   'nickname': 'Nickname',
   'spectating': 'Spectating',
+  'connection_take_a_while': 'Getting rooms. This may take a while...',
 
   // Multiplayer errors
   'connection_failed': 'Connection Failed',
@@ -247,6 +248,7 @@ const CHINESE_SIMPLIFIED = {
   'restart': '重新开始',
   'nickname': '昵称',
   'spectating': '观战中',
+  'connection_take_a_while': '正在获取房间，请稍后片刻...',
 
   // Multiplayer errors
   'connection_failed': '连接失败',
@@ -387,6 +389,7 @@ const CHINESE_TRADITIONAL = {
   'restart': '重新開始',
   'nickname': '昵稱',
   'spectating': '觀戰中',
+  'connection_take_a_while': '正在獲取房間，請稍後片刻...',
 
   // Multiplayer errors
   'connection_failed': '連接失敗',

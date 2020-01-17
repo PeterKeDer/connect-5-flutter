@@ -57,7 +57,7 @@ class StartPage extends StatelessWidget {
   }
 
   void _handleMultiplayerButtonPressed(BuildContext context) async {
-    showLoadingDialog(context);
+    showLoadingDialog(context, message: localize(context, 'connection_take_a_while'));
 
     final rooms = await Provider.of<MultiplayerManager>(context).getRooms();
     Navigator.pop(context);

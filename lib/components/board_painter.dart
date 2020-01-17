@@ -22,7 +22,7 @@ class BoardTheme {
 class BoardPainter extends CustomPainter {
   static const double LINE_WIDTH_RATIO = 0.05;
   static const double CORNER_RADIUS_RATIO = 0.35;
-  
+
   final int boardSize;
   final List<List<BoardSpotPainter>> spotPainters;
   final double cornerRadius;
@@ -39,9 +39,9 @@ class BoardPainter extends CustomPainter {
     final boxSize = boardSideLength / (boardSize + 1);
 
     final boardRect = Rect.fromLTWH(0, 0, boardSideLength, boardSideLength);
-    
+
     final boardRRect = RRect.fromRectAndRadius(boardRect, Radius.circular(cornerRadius ?? CORNER_RADIUS_RATIO * boxSize));
-    
+
     final boardPaint = Paint()
       ..color = boardTheme.boardColor;
 

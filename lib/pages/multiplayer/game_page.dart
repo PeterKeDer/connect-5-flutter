@@ -304,49 +304,55 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> with TickerPr
 
     return ChangeNotifierProvider<GameController>.value(
       value: gameController,
-      child: Scaffold(
-        body: SafeArea(
-          child: Stack(
-            children: <Widget>[
-              Positioned.fill(
-                child: GameBoard()
-              ),
-              Positioned(
-                top: DEFAULT_SPACING,
-                left: DEFAULT_SPACING,
-                right: DEFAULT_SPACING,
-                child: GameStatusBar(
-                  handleMenuButtonTapped: _handleMenuButtonTapped,
-                )
-              ),
-              Positioned(
-                top: GameStatusBar.BAR_HEIGHT + DEFAULT_SPACING + MESSAGE_SPACING,
-                left: DEFAULT_SPACING,
-                right: DEFAULT_SPACING,
-                child: AnimatedList(
-                  key: _messageListKey,
-                  initialItemCount: _messages.length,
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemBuilder: (context, index, animation) {
-                    return _buildMessageBlock(animation, _messages[index].text);
-                  },
+      child: WillPopScope(
+        onWillPop: () async {
+          _handleMenuButtonTapped();
+          return false;
+        },
+        child: Scaffold(
+          body: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: GameBoard()
                 ),
-              ),
-              if (multiplayerManager.canResetGame)
                 Positioned(
-                  bottom: DEFAULT_SPACING,
+                  top: DEFAULT_SPACING,
                   left: DEFAULT_SPACING,
                   right: DEFAULT_SPACING,
-                  child: Center(
-                    child: RaisedButton.icon(
-                      icon: Icon(Icons.refresh),
-                      label: Text(localize(context, 'restart')),
-                      onPressed: _handleRestartButtonTapped,
-                    ),
+                  child: GameStatusBar(
+                    handleMenuButtonTapped: _handleMenuButtonTapped,
+                  )
+                ),
+                Positioned(
+                  top: GameStatusBar.BAR_HEIGHT + DEFAULT_SPACING + MESSAGE_SPACING,
+                  left: DEFAULT_SPACING,
+                  right: DEFAULT_SPACING,
+                  child: AnimatedList(
+                    key: _messageListKey,
+                    initialItemCount: _messages.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemBuilder: (context, index, animation) {
+                      return _buildMessageBlock(animation, _messages[index].text);
+                    },
                   ),
                 ),
-            ],
+                if (multiplayerManager.canResetGame)
+                  Positioned(
+                    bottom: DEFAULT_SPACING,
+                    left: DEFAULT_SPACING,
+                    right: DEFAULT_SPACING,
+                    child: Center(
+                      child: RaisedButton.icon(
+                        icon: Icon(Icons.refresh),
+                        label: Text(localize(context, 'restart')),
+                        onPressed: _handleRestartButtonTapped,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
