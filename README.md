@@ -4,16 +4,16 @@ The Connect 5 game created using Google's Flutter framework.
 ## Screenshots
 
 #### Menu
-![](screenshots/ss_menu.jpg)
+<img src="screenshots/ss_menu.jpg" width="400" />
 
 #### Gameplay
-![](screenshots/ss_game.jpg)
+<img src="screenshots/ss_game.jpg" width="400" />
 
 #### Help
-![](screenshots/ss_help.jpg)
+<img src="screenshots/ss_help.jpg" width="400" />
 
 #### Settings
-![](screenshots/ss_settings.jpg)
+<img src="screenshots/ss_settings.jpg" width="400" />
 
 #### Replays
-![](screenshots/ss_replays.jpg)
+<img src="screenshots/ss_replays.jpg" width="400" />
